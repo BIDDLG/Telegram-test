@@ -2,157 +2,203 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <title>Channel Connect</title>
 
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="/manifest.json">
 
-<meta name="theme-color" content="#0d1117">
+<meta name="theme-color" content="#0a0f1c">
 <meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
 
 <style>
 
 body{
 margin:0;
-font-family:sans-serif;
-background:linear-gradient(180deg,#020617,#020617,#07152c);
+font-family:Arial;
+background:#0a0f1c;
 color:white;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
 }
 
-.card{
-background:#0d1117;
+/* HEADER */
+.header{
+background:#0f172a;
+padding:18px;
+font-size:20px;
+font-weight:bold;
+display:flex;
+align-items:center;
+box-shadow:0 4px 10px rgba(0,0,0,0.4);
+}
+
+.header span{
+margin-left:10px;
+}
+
+/* CHANNEL LIST */
+.channel-list{
+padding:15px;
+}
+
+.channel{
+display:flex;
+align-items:center;
+background:#111827;
+padding:15px;
+border-radius:15px;
+margin-bottom:12px;
+cursor:pointer;
+transition:0.3s;
+}
+
+.channel:hover{
+background:#1f2937;
+}
+
+.dp{
+width:50px;
+height:50px;
+border-radius:50%;
+background:linear-gradient(45deg,#22c55e,#3b82f6);
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:22px;
+margin-right:15px;
+}
+
+.details{
+flex:1;
+}
+
+.name{
+font-size:16px;
+font-weight:bold;
+}
+
+.last{
+font-size:13px;
+opacity:0.7;
+margin-top:5px;
+}
+
+/* FLOAT BUTTON */
+.fab{
+position:fixed;
+bottom:25px;
+right:25px;
+background:#22c55e;
+width:60px;
+height:60px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:30px;
+box-shadow:0 5px 20px rgba(0,0,0,0.5);
+cursor:pointer;
+}
+
+/* ADD MODAL */
+.modal{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.8);
+display:none;
+align-items:center;
+justify-content:center;
+}
+
+.box{
+background:#111827;
 padding:25px;
-border-radius:20px;
-width:90%;
-max-width:400px;
-box-shadow:0 0 40px rgba(0,255,170,0.1);
-text-align:center;
+border-radius:15px;
+width:80%;
 }
 
 input{
 width:100%;
 padding:12px;
+margin-top:10px;
 border:none;
 border-radius:10px;
-margin-top:15px;
-background:#020617;
+background:#1f2937;
 color:white;
 }
 
 button{
-margin-top:15px;
 width:100%;
 padding:12px;
+margin-top:15px;
 border:none;
 border-radius:10px;
-background:linear-gradient(90deg,#00ff9c,#00c3ff);
-color:black;
+background:#22c55e;
+color:white;
 font-size:16px;
-font-weight:bold;
-}
-
-.post{
-background:#020617;
-padding:12px;
-border-radius:12px;
-margin-top:15px;
-text-align:left;
-}
-
-.post img{
-width:100%;
-border-radius:10px;
-}
-
-.openBtn{
-display:block;
-margin-top:8px;
-background:#00ff9c;
-padding:6px;
-border-radius:6px;
-text-align:center;
-text-decoration:none;
-color:black;
-font-weight:bold;
 }
 
 </style>
-
 </head>
 
 <body>
 
-<div class="card" id="home">
-<h2>📡 Channel Connect</h2>
-<p style="opacity:.6">Enter Telegram Username</p>
+<div class="header">
+📡 <span>Channel Connect</span>
+</div>
 
-<input id="channel" placeholder="ex: technews">
-<button onclick="openChannel()">Open Channel</button>
+<div class="channel-list" id="channels">
 
-<p style="margin-top:10px;font-size:12px;opacity:.4">
-Smart DeepLink Enabled ✔
-</p>
+<div class="channel" onclick="openChannel('technews')">
+<div class="dp">📢</div>
+<div class="details">
+<div class="name">Tech News</div>
+<div class="last">Latest AI updates</div>
+</div>
+</div>
 
+<div class="channel" onclick="openChannel('movies')">
+<div class="dp">🎬</div>
+<div class="details">
+<div class="name">Movie Zone</div>
+<div class="last">New releases daily</div>
+</div>
+</div>
+
+</div>
+
+<div class="fab" onclick="showAdd()">+</div>
+
+<div class="modal" id="modal">
+<div class="box">
+<h3>Add Channel</h3>
+<input id="ch" placeholder="Enter Channel Name">
+<button onclick="addChannel()">Join</button>
+</div>
 </div>
 
 <script>
 
-// Detect join link
-let params = new URLSearchParams(window.location.search);
-let join = params.get("join");
-
-if(join){
-showChannel(join);
+function showAdd(){
+document.getElementById("modal").style.display="flex";
 }
 
-// Open button
-function openChannel(){
-let name = document.getElementById("channel").value;
+function addChannel(){
+let ch=document.getElementById("ch").value;
+if(ch){
+openChannel(ch);
+}
+}
+
+function openChannel(name){
 window.location.href="?join="+name;
 }
 
-// Channel Page
-function showChannel(name){
-
-document.body.innerHTML = `
-
-<div style="padding:15px">
-
-<h2 style="color:#00ff9c">📢 ${name}</h2>
-<p style="opacity:0.5">Subscribers: 124</p>
-
-<hr style="margin:15px 0">
-
-<div class="post">
-<img src="https://picsum.photos/400/200">
-<p>🚀 New AI Tool Launched!</p>
-<a class="openBtn" href="#">Open</a>
-</div>
-
-<div class="post">
-<img src="https://picsum.photos/401/200">
-<p>🔥 Telegram Update Released</p>
-<a class="openBtn" href="#">Open</a>
-</div>
-
-<div class="post">
-<img src="https://picsum.photos/402/200">
-<p>🎬 Latest Movie News</p>
-<a class="openBtn" href="#">Open</a>
-</div>
-
-</div>
-`;
-}
-
-// PWA Service Worker
-if('serviceWorker' in navigator){
-navigator.serviceWorker.register('sw.js');
+if ('serviceWorker' in navigator) {
+navigator.serviceWorker.register('/sw.js');
 }
 
 </script>
