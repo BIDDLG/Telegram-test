@@ -1,0 +1,41 @@
+<!DOCTYPE html><html>
+<head><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#111"><title>Channel App</title><style>
+body{
+background:#111;
+color:white;
+font-family:Arial;
+text-align:center;
+padding-top:100px;
+}
+
+.box{
+background:#222;
+padding:30px;
+border-radius:12px;
+display:inline-block;
+}
+</style></head><body><div class="box">
+<h2>Channel App</h2>
+<p id="status">Welcome</p>
+</div><script>
+
+// Deep Link Detect
+const params = new URLSearchParams(window.location.search);
+const join = params.get("join");
+
+if(join){
+document.getElementById("status").innerText = "Joining Channel: " + join;
+
+// Save channel locally
+localStorage.setItem("joined_channel", join);
+}
+
+// Load saved channel
+let saved = localStorage.getItem("joined_channel");
+if(saved){
+document.getElementById("status").innerText = "Last Channel: " + saved;
+}
+
+</script></body>
+</html>
