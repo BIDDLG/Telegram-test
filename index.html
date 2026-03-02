@@ -1,135 +1,158 @@
-<!DOCTYPE html><html>
+<!DOCTYPE html>
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Telegram Channel App</title><link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#0f172a">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>Channel Connect</title>
+
+<link rel="manifest" href="manifest.json">
+
+<meta name="theme-color" content="#0d1117">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes"><style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:sans-serif;
-}
+
+<style>
 
 body{
-background:linear-gradient(135deg,#020617,#020617,#0f172a);
-height:100vh;
+margin:0;
+font-family:sans-serif;
+background:linear-gradient(180deg,#020617,#020617,#07152c);
+color:white;
 display:flex;
-align-items:center;
 justify-content:center;
+align-items:center;
+height:100vh;
 }
 
-.container{
-width:90%;
-max-width:420px;
-background:#020617;
-border-radius:25px;
+.card{
+background:#0d1117;
 padding:25px;
-box-shadow:0 0 40px rgba(0,0,0,0.6);
+border-radius:20px;
+width:90%;
+max-width:400px;
+box-shadow:0 0 40px rgba(0,255,170,0.1);
 text-align:center;
-}
-
-.logo{
-font-size:22px;
-font-weight:bold;
-margin-bottom:15px;
-color:#22c55e;
-}
-
-.desc{
-font-size:14px;
-color:#94a3b8;
-margin-bottom:25px;
 }
 
 input{
 width:100%;
-padding:14px;
-border-radius:12px;
+padding:12px;
 border:none;
-background:#0f172a;
+border-radius:10px;
+margin-top:15px;
+background:#020617;
 color:white;
-font-size:16px;
-margin-bottom:15px;
-outline:none;
 }
 
 button{
+margin-top:15px;
 width:100%;
-padding:14px;
-border-radius:12px;
+padding:12px;
 border:none;
-background:linear-gradient(90deg,#22c55e,#4ade80);
+border-radius:10px;
+background:linear-gradient(90deg,#00ff9c,#00c3ff);
+color:black;
 font-size:16px;
 font-weight:bold;
-color:#022c22;
-cursor:pointer;
-transition:0.2s;
 }
 
-button:hover{
-transform:scale(1.03);
+.post{
+background:#020617;
+padding:12px;
+border-radius:12px;
+margin-top:15px;
+text-align:left;
 }
 
-.footer{
-margin-top:20px;
-font-size:12px;
-color:#64748b;
+.post img{
+width:100%;
+border-radius:10px;
 }
-</style></head><body><div class="container">
-<div class="logo">📡 Channel Connect</div>
-<div class="desc">Enter Telegram Channel Username</div><input id="channel" placeholder="ex: technews" /><button onclick="openChannel()">Open Channel</button>
 
-<div class="footer">
-Smart Link Enabled ✔️
+.openBtn{
+display:block;
+margin-top:8px;
+background:#00ff9c;
+padding:6px;
+border-radius:6px;
+text-align:center;
+text-decoration:none;
+color:black;
+font-weight:bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="card" id="home">
+<h2>📡 Channel Connect</h2>
+<p style="opacity:.6">Enter Telegram Username</p>
+
+<input id="channel" placeholder="ex: technews">
+<button onclick="openChannel()">Open Channel</button>
+
+<p style="margin-top:10px;font-size:12px;opacity:.4">
+Smart DeepLink Enabled ✔
+</p>
+
 </div>
-</div>
-  
-  <script>
 
-// Open Channel
+<script>
+
+// Detect join link
+let params = new URLSearchParams(window.location.search);
+let join = params.get("join");
+
+if(join){
+showChannel(join);
+}
+
+// Open button
 function openChannel(){
-let ch = document.getElementById("channel").value;
-
-if(!ch) return;
-
-// Save channel locally
-localStorage.setItem("channel", ch);
-
-// Reload with join
-window.location.href = "?join=" + ch;
+let name = document.getElementById("channel").value;
+window.location.href="?join="+name;
 }
 
-// Auto Join if link opened
-const params = new URLSearchParams(window.location.search);
-const joinChannel = params.get("join");
-
-if(joinChannel){
-localStorage.setItem("channel", joinChannel);
-showChannel(joinChannel);
-}
-
-// Load saved channel
-const saved = localStorage.getItem("channel");
-if(saved){
-showChannel(saved);
-}
-
-// Show Channel UI
+// Channel Page
 function showChannel(name){
+
 document.body.innerHTML = `
-<div style="padding:20px">
-<h2>📢 ${name}</h2>
-<p>Subscribers: <span id="subs">1</span></p>
-<hr>
-<div id="posts"></div>
+
+<div style="padding:15px">
+
+<h2 style="color:#00ff9c">📢 ${name}</h2>
+<p style="opacity:0.5">Subscribers: 124</p>
+
+<hr style="margin:15px 0">
+
+<div class="post">
+<img src="https://picsum.photos/400/200">
+<p>🚀 New AI Tool Launched!</p>
+<a class="openBtn" href="#">Open</a>
+</div>
+
+<div class="post">
+<img src="https://picsum.photos/401/200">
+<p>🔥 Telegram Update Released</p>
+<a class="openBtn" href="#">Open</a>
+</div>
+
+<div class="post">
+<img src="https://picsum.photos/402/200">
+<p>🎬 Latest Movie News</p>
+<a class="openBtn" href="#">Open</a>
+</div>
+
 </div>
 `;
 }
 
-if ('serviceWorker' in navigator) {
-navigator.serviceWorker.register('/sw.js');
+// PWA Service Worker
+if('serviceWorker' in navigator){
+navigator.serviceWorker.register('sw.js');
 }
 
 </script>
