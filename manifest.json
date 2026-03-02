@@ -1,19 +1,19 @@
 {
-  "name": "Telegram Test",
+  "name": "Telegram Channel App",
   "short_name": "Telegram",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000",
-  "description": "Telegram Style Channel App",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2111/2111646.png",
+      "src": "https://telegramtest1.netlify.app/icon.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2111/2111646.png",
+      "src": "https://telegramtest1.netlify.app/icon.png",
       "sizes": "512x512",
       "type": "image/png"
     }
