@@ -1,58 +1,131 @@
-<!DOCTYPE html><html>
+<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Telegram Channel App</title>  <!-- PWA Support -->  <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#000000">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">  <style>
-    body {
-      margin:0;
-      background:#000;
-      color:white;
-      font-family:sans-serif;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      height:100vh;
-      text-align:center;
-    }
-    .box {
-      background:#111;
-      padding:30px;
-      border-radius:15px;
-      width:80%;
-    }
-    input {
-      padding:12px;
-      width:100%;
-      border-radius:8px;
-      border:none;
-      margin-top:10px;
-    }
-    button {
-      margin-top:15px;
-      padding:12px;
-      width:100%;
-      background:#00c896;
-      border:none;
-      border-radius:8px;
-      font-size:16px;
-      color:white;
-    }
-  </style></head><body><div class="box">
-  <h2>Telegram Channel App</h2>
-  <input id="channel" placeholder="Enter Channel Name">
-  <button onclick="openChannel()">Open</button>
-</div><script>
-function openChannel(){
-  let ch = document.getElementById("channel").value;
-  window.location.href = "?join=" + ch;
+<meta charset="UTF-8">
+<title>Telegram Channel App</title>
+
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#000000">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="/icon.png">
+
+<style>
+body{
+ margin:0;
+ background:#000;
+ color:white;
+ font-family:sans-serif;
+ text-align:center;
 }
 
-// Service Worker Register
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js');
+.box{
+ background:#111;
+ padding:25px;
+ margin:30px;
+ border-radius:15px;
 }
-</script></body>
+
+input{
+ padding:12px;
+ width:80%;
+ border-radius:8px;
+ border:none;
+ margin-top:10px;
+}
+
+button{
+ margin-top:15px;
+ padding:12px;
+ width:85%;
+ background:#00c896;
+ border:none;
+ border-radius:8px;
+ font-size:16px;
+ color:white;
+}
+
+.post{
+ background:#111;
+ margin:15px;
+ padding:15px;
+ border-radius:10px;
+}
+
+.post img{
+ width:100%;
+ border-radius:10px;
+}
+
+a{
+ color:#00c896;
+ text-decoration:none;
+}
+</style>
+
+</head>
+<body>
+
+<!-- JOIN SCREEN -->
+<div class="box" id="joinBox">
+  <h2>Join Channel</h2>
+  <input id="channel" placeholder="Enter Channel ID">
+  <button onclick="joinChannel()">Join</button>
+</div>
+
+<!-- CHANNEL FEED -->
+<div id="feed" style="display:none">
+  <h2 id="chName"></h2>
+  <p>Subscribers: <span id="subs"></span></p>
+  <div id="posts"></div>
+</div>
+
+<script>
+
+// 🔗 DEEP LINK SUPPORT
+const params = new URLSearchParams(window.location.search);
+if(params.get("join")){
+ localStorage.setItem("channel", params.get("join"));
+}
+
+// JOIN
+function joinChannel(){
+ let ch = document.getElementById("channel").value;
+ localStorage.setItem("channel", ch);
+ loadChannel();
+}
+
+// LOAD CHANNEL
+function loadChannel(){
+ let ch = localStorage.getItem("channel");
+ if(!ch) return;
+
+ document.getElementById("joinBox").style.display="none";
+ document.getElementById("feed").style.display="block";
+
+ document.getElementById("chName").innerText = ch;
+
+ // Fake subscriber count
+ document.getElementById("subs").innerText =
+ Math.floor(Math.random()*500)+100;
+
+ // Demo post
+ document.getElementById("posts").innerHTML = `
+   <div class="post">
+     <img src="https://via.placeholder.com/400">
+     <p>Welcome to ${ch}</p>
+     <a href="#">Open Link</a>
+   </div>
+ `;
+}
+
+loadChannel();
+
+// SERVICE WORKER
+if ('serviceWorker' in navigator) {
+ navigator.serviceWorker.register('/sw.js');
+}
+
+</script>
+
+</body>
 </html>
