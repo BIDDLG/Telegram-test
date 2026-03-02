@@ -1,100 +1,99 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html><html>
 <head>
 <meta charset="UTF-8">
-<title>Telegram Channel App</title>
-
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#000000">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Telegram Channel App</title><link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0f172a">
 <meta name="mobile-web-app-capable" content="yes">
-
-<style>
-body{
+<meta name="apple-mobile-web-app-capable" content="yes"><style>
+*{
 margin:0;
-background:#000;
-color:white;
+padding:0;
+box-sizing:border-box;
 font-family:sans-serif;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
 }
 
-.box{
-background:#111;
-padding:25px;
-border-radius:15px;
+body{
+background:linear-gradient(135deg,#020617,#020617,#0f172a);
+height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.container{
 width:90%;
+max-width:420px;
+background:#020617;
+border-radius:25px;
+padding:25px;
+box-shadow:0 0 40px rgba(0,0,0,0.6);
 text-align:center;
 }
 
+.logo{
+font-size:22px;
+font-weight:bold;
+margin-bottom:15px;
+color:#22c55e;
+}
+
+.desc{
+font-size:14px;
+color:#94a3b8;
+margin-bottom:25px;
+}
+
 input{
-padding:12px;
 width:100%;
-border-radius:8px;
+padding:14px;
+border-radius:12px;
 border:none;
-margin-top:10px;
+background:#0f172a;
+color:white;
+font-size:16px;
+margin-bottom:15px;
+outline:none;
 }
 
 button{
-margin-top:15px;
-padding:12px;
 width:100%;
-background:#00c896;
+padding:14px;
+border-radius:12px;
 border:none;
-border-radius:8px;
+background:linear-gradient(90deg,#22c55e,#4ade80);
 font-size:16px;
-color:white;
+font-weight:bold;
+color:#022c22;
+cursor:pointer;
+transition:0.2s;
 }
-</style>
-</head>
 
-<body>
+button:hover{
+transform:scale(1.03);
+}
 
-<div class="box" id="loginBox">
-<h2>Admin Login</h2>
-<input id="pass" placeholder="Enter Admin Password">
-<button onclick="login()">Login</button>
+.footer{
+margin-top:20px;
+font-size:12px;
+color:#64748b;
+}
+</style></head><body><div class="container">
+<div class="logo">📡 Channel Connect</div>
+<div class="desc">Enter Telegram Channel Username</div><input id="channel" placeholder="ex: technews" /><button onclick="openChannel()">Open Channel</button>
+
+<div class="footer">
+Smart Link Enabled ✔️
 </div>
-
-<div class="box" id="adminBox" style="display:none;">
-<h2>Admin Panel</h2>
-<input id="msg" placeholder="Write Post">
-<button onclick="addPost()">Add Post</button>
-<br><br>
-<button onclick="logout()">Logout</button>
-</div>
-
-<script>
-
-const ADMIN_PASSWORD = "1234";
-
-function login(){
-let p = document.getElementById("pass").value;
-if(p === ADMIN_PASSWORD){
-document.getElementById("loginBox").style.display="none";
-document.getElementById("adminBox").style.display="block";
-}else{
-alert("Wrong Password");
+</div><script>
+function openChannel(){
+let ch = document.getElementById("channel").value;
+if(ch){
+window.location.href = "?join=" + ch;
 }
 }
 
-function logout(){
-location.reload();
-}
-
-function addPost(){
-let text = document.getElementById("msg").value;
-localStorage.setItem("post", text);
-alert("Post Added");
-}
-
-// service worker
 if ('serviceWorker' in navigator) {
 navigator.serviceWorker.register('/sw.js');
 }
-
-</script>
-
-</body>
+</script></body>
 </html>
