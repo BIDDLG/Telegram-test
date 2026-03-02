@@ -84,16 +84,55 @@ color:#64748b;
 <div class="footer">
 Smart Link Enabled ✔️
 </div>
-</div><script>
+</div>
+  
+  <script>
+
+// Open Channel
 function openChannel(){
 let ch = document.getElementById("channel").value;
-if(ch){
+
+if(!ch) return;
+
+// Save channel locally
+localStorage.setItem("channel", ch);
+
+// Reload with join
 window.location.href = "?join=" + ch;
 }
+
+// Auto Join if link opened
+const params = new URLSearchParams(window.location.search);
+const joinChannel = params.get("join");
+
+if(joinChannel){
+localStorage.setItem("channel", joinChannel);
+showChannel(joinChannel);
+}
+
+// Load saved channel
+const saved = localStorage.getItem("channel");
+if(saved){
+showChannel(saved);
+}
+
+// Show Channel UI
+function showChannel(name){
+document.body.innerHTML = `
+<div style="padding:20px">
+<h2>📢 ${name}</h2>
+<p>Subscribers: <span id="subs">1</span></p>
+<hr>
+<div id="posts"></div>
+</div>
+`;
 }
 
 if ('serviceWorker' in navigator) {
 navigator.serviceWorker.register('/sw.js');
 }
-</script></body>
+
+</script>
+
+</body>
 </html>
