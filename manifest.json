@@ -1,6 +1,7 @@
 {
   "name": "Telegram Channel App",
   "short_name": "Telegram",
+  "description": "Telegram Style Channel App",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",
@@ -8,12 +9,12 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "https://telegramtest1.netlify.app/icon.png",
+      "src": "/icon.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "https://telegramtest1.netlify.app/icon.png",
+      "src": "/icon.png",
       "sizes": "512x512",
       "type": "image/png"
     }
