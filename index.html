@@ -1,44 +1,58 @@
 <!DOCTYPE html><html>
 <head>
-  <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#000000">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#111"><title>Channel App</title><style>
-body{
-background:#111;
-color:white;
-font-family:Arial;
-text-align:center;
-padding-top:100px;
-}
-
-.box{
-background:#222;
-padding:30px;
-border-radius:12px;
-display:inline-block;
-}
-</style></head><body><div class="box">
-<h2>Channel App</h2>
-<p id="status">Welcome</p>
+  <meta charset="UTF-8">
+  <title>Telegram Channel App</title>  <!-- PWA Support -->  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#000000">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">  <style>
+    body {
+      margin:0;
+      background:#000;
+      color:white;
+      font-family:sans-serif;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      height:100vh;
+      text-align:center;
+    }
+    .box {
+      background:#111;
+      padding:30px;
+      border-radius:15px;
+      width:80%;
+    }
+    input {
+      padding:12px;
+      width:100%;
+      border-radius:8px;
+      border:none;
+      margin-top:10px;
+    }
+    button {
+      margin-top:15px;
+      padding:12px;
+      width:100%;
+      background:#00c896;
+      border:none;
+      border-radius:8px;
+      font-size:16px;
+      color:white;
+    }
+  </style></head><body><div class="box">
+  <h2>Telegram Channel App</h2>
+  <input id="channel" placeholder="Enter Channel Name">
+  <button onclick="openChannel()">Open</button>
 </div><script>
-
-// Deep Link Detect
-const params = new URLSearchParams(window.location.search);
-const join = params.get("join");
-
-if(join){
-document.getElementById("status").innerText = "Joining Channel: " + join;
-
-// Save channel locally
-localStorage.setItem("joined_channel", join);
+function openChannel(){
+  let ch = document.getElementById("channel").value;
+  window.location.href = "?join=" + ch;
 }
 
-// Load saved channel
-let saved = localStorage.getItem("joined_channel");
-if(saved){
-document.getElementById("status").innerText = "Last Channel: " + saved;
+// Service Worker Register
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
 }
-
 </script></body>
 </html>
