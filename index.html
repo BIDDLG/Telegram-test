@@ -7,122 +7,91 @@
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#000000">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="apple-touch-icon" href="/icon.png">
 
 <style>
 body{
- margin:0;
- background:#000;
- color:white;
- font-family:sans-serif;
- text-align:center;
+margin:0;
+background:#000;
+color:white;
+font-family:sans-serif;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
 }
 
 .box{
- background:#111;
- padding:25px;
- margin:30px;
- border-radius:15px;
+background:#111;
+padding:25px;
+border-radius:15px;
+width:90%;
+text-align:center;
 }
 
 input{
- padding:12px;
- width:80%;
- border-radius:8px;
- border:none;
- margin-top:10px;
+padding:12px;
+width:100%;
+border-radius:8px;
+border:none;
+margin-top:10px;
 }
 
 button{
- margin-top:15px;
- padding:12px;
- width:85%;
- background:#00c896;
- border:none;
- border-radius:8px;
- font-size:16px;
- color:white;
-}
-
-.post{
- background:#111;
- margin:15px;
- padding:15px;
- border-radius:10px;
-}
-
-.post img{
- width:100%;
- border-radius:10px;
-}
-
-a{
- color:#00c896;
- text-decoration:none;
+margin-top:15px;
+padding:12px;
+width:100%;
+background:#00c896;
+border:none;
+border-radius:8px;
+font-size:16px;
+color:white;
 }
 </style>
-
 </head>
+
 <body>
 
-<!-- JOIN SCREEN -->
-<div class="box" id="joinBox">
-  <h2>Join Channel</h2>
-  <input id="channel" placeholder="Enter Channel ID">
-  <button onclick="joinChannel()">Join</button>
+<div class="box" id="loginBox">
+<h2>Admin Login</h2>
+<input id="pass" placeholder="Enter Admin Password">
+<button onclick="login()">Login</button>
 </div>
 
-<!-- CHANNEL FEED -->
-<div id="feed" style="display:none">
-  <h2 id="chName"></h2>
-  <p>Subscribers: <span id="subs"></span></p>
-  <div id="posts"></div>
+<div class="box" id="adminBox" style="display:none;">
+<h2>Admin Panel</h2>
+<input id="msg" placeholder="Write Post">
+<button onclick="addPost()">Add Post</button>
+<br><br>
+<button onclick="logout()">Logout</button>
 </div>
 
 <script>
 
-// 🔗 DEEP LINK SUPPORT
-const params = new URLSearchParams(window.location.search);
-if(params.get("join")){
- localStorage.setItem("channel", params.get("join"));
+const ADMIN_PASSWORD = "1234";
+
+function login(){
+let p = document.getElementById("pass").value;
+if(p === ADMIN_PASSWORD){
+document.getElementById("loginBox").style.display="none";
+document.getElementById("adminBox").style.display="block";
+}else{
+alert("Wrong Password");
+}
 }
 
-// JOIN
-function joinChannel(){
- let ch = document.getElementById("channel").value;
- localStorage.setItem("channel", ch);
- loadChannel();
+function logout(){
+location.reload();
 }
 
-// LOAD CHANNEL
-function loadChannel(){
- let ch = localStorage.getItem("channel");
- if(!ch) return;
-
- document.getElementById("joinBox").style.display="none";
- document.getElementById("feed").style.display="block";
-
- document.getElementById("chName").innerText = ch;
-
- // Fake subscriber count
- document.getElementById("subs").innerText =
- Math.floor(Math.random()*500)+100;
-
- // Demo post
- document.getElementById("posts").innerHTML = `
-   <div class="post">
-     <img src="https://via.placeholder.com/400">
-     <p>Welcome to ${ch}</p>
-     <a href="#">Open Link</a>
-   </div>
- `;
+function addPost(){
+let text = document.getElementById("msg").value;
+localStorage.setItem("post", text);
+alert("Post Added");
 }
 
-loadChannel();
-
-// SERVICE WORKER
+// service worker
 if ('serviceWorker' in navigator) {
- navigator.serviceWorker.register('/sw.js');
+navigator.serviceWorker.register('/sw.js');
 }
 
 </script>
