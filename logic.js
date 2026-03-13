@@ -1,4 +1,4 @@
-// 🚀 game.js - ROYAL ESPORTS FULL 3D EDITION (LAG FREE & SIZE FIXED) 🚀
+// 🚀 game.js - ROYAL ESPORTS FULL 3D EDITION (VISIBLE & PERFECT SIZE) 🚀
 
 const firebaseConfig = { apiKey: "AIzaSyD3bPF3B-a6yR8gQxKcKPBVq9-kSPn3MsY", authDomain: "maze-run-7c4b3.firebaseapp.com", projectId: "maze-run-7c4b3", storageBucket: "maze-run-7c4b3.firebasestorage.app", messagingSenderId: "919108275682", appId: "1:919108275682:web:c14c14061bced458f6fdbb" }; 
 if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); } 
@@ -109,7 +109,7 @@ const menuEnvGroup = new THREE.Group(); scene.add(menuEnvGroup);
 const myPlayer = new THREE.Group(); scene.add(myPlayer); const opponentPlayer = new THREE.Group(); scene.add(opponentPlayer); opponentPlayer.position.set(1000, 1000, 1000); opponentPlayer.visible = false; myPlayer.add(myLantern); opponentPlayer.add(oppLantern); 
 
 // ==========================================
-// 🚀 SMART GLB LOADER (LAG & SIZE FIXES) 🚀
+// 🚀 SMART GLB LOADER (CENTERING & SIZE FIXES) 🚀
 // ==========================================
 let myMixer = null, oppMixer = null; let myAnims = {}, oppAnims = {}; let myCurrentAnim = 'idle', oppCurrentAnim = 'idle'; let lobbyRotationY = 0; let isDraggingLobby = false; 
 const dracoLoader = new THREE.DRACOLoader(); dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/'); 
@@ -117,38 +117,41 @@ const dracoLoader = new THREE.DRACOLoader(); dracoLoader.setDecoderPath('https:/
 window.GameModels = { tree: null, coin: null, rock: null, grass: null, medkit: null };
 const gLoader = new THREE.GLTFLoader(); gLoader.setDRACOLoader(dracoLoader);
 
-// 🛠️ Ye function Model ko chota karta hai, usko center me lata hai (Coin ghoomne ka fix), aur LAG hatata hai (Shadows OFF karke)
-function fixModel(gltf, targetSize) {
+// 🛠️ Updated Fixer: 
+// - centerIt = true: Sirf Coin aur Medkit ke liye taki hawa me theek se ghoomein.
+// - centerIt = false: Tree aur Rock ke liye taki wo zameen par khade rahein, underground na ghuse!
+function fixModel(gltf, targetSize, centerIt) {
     let model = gltf.scene;
     
-    // Auto-Center Logic (Coin ajeeb nahi ghoomega ab)
-    const box = new THREE.Box3().setFromObject(model);
-    const center = box.getCenter(new THREE.Vector3());
-    model.position.sub(center); 
+    if (centerIt) {
+        const box = new THREE.Box3().setFromObject(model);
+        const center = box.getCenter(new THREE.Vector3());
+        model.position.sub(center); 
+    }
 
     let wrapper = new THREE.Group();
     wrapper.add(model);
-    wrapper.scale.set(targetSize, targetSize, targetSize); // Size ko drastically chota kar diya (0.05 / 0.1)
+    wrapper.scale.set(targetSize, targetSize, targetSize); 
 
-    // LAG FIX: Prop par shadow OFF rakhi hai
     wrapper.traverse(c => { 
         if(c.isMesh) { c.castShadow = false; c.receiveShadow = false; }
     });
     return wrapper;
 }
 
-// Yahan sizes set hain (agar phir bhi bade lage toh 0.08 ko 0.04 kar dena)
-gLoader.load('tree.glb', (g) => { window.GameModels.tree = fixModel(g, 0.08); }, undefined, ()=>{});
-gLoader.load('coin.glb', (g) => { window.GameModels.coin = fixModel(g, 0.05); }, undefined, ()=>{});
-gLoader.load('rock.glb', (g) => { window.GameModels.rock = fixModel(g, 0.05); }, undefined, ()=>{});
-gLoader.load('grass.glb', (g) => { window.GameModels.grass = fixModel(g, 0.06); }, undefined, ()=>{});
-gLoader.load('medkit.glb', (g) => { window.GameModels.medkit = fixModel(g, 0.05); }, undefined, ()=>{});
+// 🎛️ SIZE CONTROLS: Yahan se numbers change karke size badha/ghata sakta hai!
+// Tree, Rock, Grass ko centerIt=false diya hai taki zameen me na dhase.
+gLoader.load('tree.glb', (g) => { window.GameModels.tree = fixModel(g, 0.4, false); }, undefined, ()=>{});
+gLoader.load('coin.glb', (g) => { window.GameModels.coin = fixModel(g, 0.25, true); }, undefined, ()=>{});
+gLoader.load('rock.glb', (g) => { window.GameModels.rock = fixModel(g, 0.3, false); }, undefined, ()=>{});
+gLoader.load('grass.glb', (g) => { window.GameModels.grass = fixModel(g, 0.35, false); }, undefined, ()=>{});
+gLoader.load('medkit.glb', (g) => { window.GameModels.medkit = fixModel(g, 0.25, true); }, undefined, ()=>{});
 
 window.spawnModel = function(modelType, x, y, z, randomScale = false) {
     if(!window.GameModels[modelType]) return null;
     let mesh = window.GameModels[modelType].clone(); mesh.position.set(x, y, z);
     if(randomScale) { 
-        let s = 0.8 + Math.random() * 0.5; // Natural variance
+        let s = 0.8 + Math.random() * 0.5; 
         mesh.scale.set(mesh.scale.x * s, mesh.scale.y * s, mesh.scale.z * s); 
         mesh.rotation.y = Math.random() * Math.PI * 2; 
     }
@@ -227,7 +230,7 @@ window.spawnMedkitLocally = function(x, z, id) {
 }
 
 // ==========================================
-// 🚀 3D MAZE BUILDER ENGINE (LAG FIX) 🚀
+// 🚀 3D MAZE BUILDER ENGINE 🚀
 // ==========================================
 window.buildMazeFromMap = function(mapArray, dynamicSize) { 
     if(dynamicSize) { window.mazeSize = dynamicSize; window.gameState.size = dynamicSize; }
@@ -243,7 +246,7 @@ window.buildMazeFromMap = function(mapArray, dynamicSize) {
     document.getElementById('joystick-wrapper').style.display = 'block';
     document.getElementById('spectate-btn').style.display = 'none'; document.getElementById('coin-counter').innerText = `COINS: 0`; playAnim('my', 'idle'); if(!isSinglePlayer) playAnim('opp', 'idle'); targetPitch = 0; targetRotation = 0; 
     
-    // 🌳 JUNGLE ENVIRONMENT (LAG FIX: Ab sirf 40 ped aayenge, 300 nahi)
+    // 🌳 JUNGLE ENVIRONMENT
     let envRange = offset + 100;
     for(let i=0; i<40; i++) { 
         let tx = (Math.random() - 0.5) * envRange * 2; let tz = (Math.random() - 0.5) * envRange * 2;
@@ -269,7 +272,6 @@ window.buildMazeFromMap = function(mapArray, dynamicSize) {
                 walls.push(new THREE.Box3().setFromObject(oldW));
             } 
             else { 
-                // Patthar aur ghas bahut kam kar diye lag fix karne ke liye
                 let rand = Math.random();
                 if(rand > 0.98) { let rock = window.spawnModel('rock', posX + (Math.random()-0.5)*2, 0, posZ + (Math.random()-0.5)*2, true); if(rock) mazeGroup.add(rock); } 
                 else if(rand > 0.90) { let grass = window.spawnModel('grass', posX + (Math.random()-0.5)*2, 0, posZ + (Math.random()-0.5)*2, true); if(grass) mazeGroup.add(grass); }
