@@ -1,4 +1,4 @@
-// 🚀 game.js - ROYAL ESPORTS FULL 3D EDITION 🚀
+// 🚀 game.js - ROYAL ESPORTS FULL 3D EDITION (Optimized Props) 🚀
 
 const firebaseConfig = { apiKey: "AIzaSyD3bPF3B-a6yR8gQxKcKPBVq9-kSPn3MsY", authDomain: "maze-run-7c4b3.firebaseapp.com", projectId: "maze-run-7c4b3", storageBucket: "maze-run-7c4b3.firebasestorage.app", messagingSenderId: "919108275682", appId: "1:919108275682:web:c14c14061bced458f6fdbb" }; 
 if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); } 
@@ -80,14 +80,9 @@ window.getMyProfile = () => myProfile; window.setOppProfile = (p) => { oppProfil
 const AudioCtx = window.AudioContext || window.webkitAudioContext; const audioContext = new AudioCtx(); const gameSounds = {}; 
 function loadSound(name, url) { 
     return new Promise((resolve, reject) => {
-        const request = new XMLHttpRequest();
-        request.open('GET', url, true);
-        request.responseType = 'arraybuffer';
-        request.onload = function() {
-            audioContext.decodeAudioData(request.response, (buffer) => { gameSounds[name] = buffer; resolve(buffer); }, (e) => reject(e));
-        };
-        request.onerror = function() { reject(new Error("Network error")); };
-        request.send();
+        const request = new XMLHttpRequest(); request.open('GET', url, true); request.responseType = 'arraybuffer';
+        request.onload = function() { audioContext.decodeAudioData(request.response, (buffer) => { gameSounds[name] = buffer; resolve(buffer); }, (e) => reject(e)); };
+        request.onerror = function() { reject(new Error("Network error")); }; request.send();
     });
 } 
 loadSound('coin', 'coin.mp3'); loadSound('run', 'run.mp3'); loadSound('win', 'win.mp3'); loadSound('lose', 'lose.mp3'); 
@@ -112,11 +107,15 @@ const ambientLight = new THREE.AmbientLight(0xffffff, 0.8); scene.add(ambientLig
 const mainLight = new THREE.DirectionalLight(0xffeedd, 1.0); mainLight.position.set(20, 60, 20); if(currentGraphics !== 'LOW') mainLight.castShadow = true; scene.add(mainLight); 
 scene.fog = new THREE.FogExp2(0x87cefa, currentGraphics === 'LOW' ? 0.02 : 0.015); 
 
-// Fallback Texture/Geometry (Agar 3D model na ho)
+// 🧱 STANDARD WALL & FLOOR TEXTURES (Restored exactly as original) 🧱
 let wallUnit = 5; 
 const brickTex = textureLoader.load('wall.png'); brickTex.wrapS = THREE.RepeatWrapping; brickTex.wrapT = THREE.RepeatWrapping; brickTex.repeat.set(1, 1);
 const wallMat = new THREE.MeshStandardMaterial({ map: brickTex, roughness: 0.9 }); 
 const wallGeo = new THREE.BoxGeometry(wallUnit, wallUnit, wallUnit);
+
+const grassTex = textureLoader.load('floor.png'); grassTex.wrapS = THREE.RepeatWrapping; grassTex.wrapT = THREE.RepeatWrapping; grassTex.repeat.set(50, 50); 
+const floorMesh = new THREE.Mesh(new THREE.PlaneGeometry(500, 500), new THREE.MeshStandardMaterial({ map: grassTex, roughness: 1.0, color: 0x999999 })); 
+floorMesh.rotation.x = -Math.PI / 2; if(currentGraphics !== 'LOW') floorMesh.receiveShadow = true; scene.add(floorMesh);
 
 const myLantern = new THREE.PointLight(0xffb84d, 0, 25); myLantern.position.set(0, 1.5, 1.5); 
 const oppLantern = new THREE.PointLight(0xffb84d, 0, 25); oppLantern.position.set(0, 1.5, 1.5); 
@@ -124,32 +123,26 @@ const menuEnvGroup = new THREE.Group(); scene.add(menuEnvGroup);
 const myPlayer = new THREE.Group(); scene.add(myPlayer); const opponentPlayer = new THREE.Group(); scene.add(opponentPlayer); opponentPlayer.position.set(1000, 1000, 1000); opponentPlayer.visible = false; myPlayer.add(myLantern); opponentPlayer.add(oppLantern); 
 
 // ==========================================
-// 🚀 GLB MODELS LOADER (WALL, TREE, ROCK, COIN, GRASS, FLOOR) 🚀
+// 🚀 GLB MODELS LOADER (ONLY 3D PROPS: TREE, ROCK, COIN, MEDKIT, GRASS) 🚀
 // ==========================================
 let myMixer = null, oppMixer = null; let myAnims = {}, oppAnims = {}; let myCurrentAnim = 'idle', oppCurrentAnim = 'idle'; let lobbyRotationY = 0; let isDraggingLobby = false; 
 const dracoLoader = new THREE.DRACOLoader(); dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/'); 
 
-window.GameModels = { wall: null, tree: null, coin: null, rock: null, grass: null, floor: null };
+window.GameModels = { tree: null, coin: null, rock: null, grass: null, medkit: null };
 const gLoader = new THREE.GLTFLoader(); gLoader.setDRACOLoader(dracoLoader);
 
-// Models loading...
-gLoader.load('wall.glb', (gltf) => { window.GameModels.wall = gltf.scene; window.GameModels.wall.traverse(c => { if(c.isMesh && currentGraphics !== 'LOW') { c.castShadow = true; c.receiveShadow = true; }}); }, undefined, ()=>{});
+// Props loading...
 gLoader.load('tree.glb', (gltf) => { window.GameModels.tree = gltf.scene; window.GameModels.tree.traverse(c => { if(c.isMesh && currentGraphics !== 'LOW') { c.castShadow = true; c.receiveShadow = true; }}); }, undefined, ()=>{});
 gLoader.load('coin.glb', (gltf) => { window.GameModels.coin = gltf.scene; window.GameModels.coin.traverse(c => { if(c.isMesh && currentGraphics !== 'LOW') { c.castShadow = true; }}); }, undefined, ()=>{});
 gLoader.load('rock.glb', (gltf) => { window.GameModels.rock = gltf.scene; window.GameModels.rock.traverse(c => { if(c.isMesh && currentGraphics !== 'LOW') { c.castShadow = true; c.receiveShadow = true; }}); }, undefined, ()=>{});
 gLoader.load('grass.glb', (gltf) => { window.GameModels.grass = gltf.scene; window.GameModels.grass.scale.set(1.5, 1.5, 1.5); }, undefined, ()=>{});
-gLoader.load('floor.glb', (gltf) => { window.GameModels.floor = gltf.scene; window.GameModels.floor.traverse(c => { if(c.isMesh && currentGraphics !== 'LOW') { c.receiveShadow = true; }}); }, undefined, ()=>{});
+gLoader.load('medkit.glb', (gltf) => { window.GameModels.medkit = gltf.scene; window.GameModels.medkit.traverse(c => { if(c.isMesh && currentGraphics !== 'LOW') { c.castShadow = true; }}); }, undefined, ()=>{});
 
 // Helper for Object Spawning
 window.spawnModel = function(modelType, x, y, z, randomScale = false) {
     if(!window.GameModels[modelType]) return null;
-    let mesh = window.GameModels[modelType].clone();
-    mesh.position.set(x, y, z);
-    if(randomScale) {
-        let s = 0.8 + Math.random() * 0.5;
-        mesh.scale.set(mesh.scale.x * s, mesh.scale.y * s, mesh.scale.z * s);
-        mesh.rotation.y = Math.random() * Math.PI * 2;
-    }
+    let mesh = window.GameModels[modelType].clone(); mesh.position.set(x, y, z);
+    if(randomScale) { let s = 0.8 + Math.random() * 0.5; mesh.scale.set(mesh.scale.x * s, mesh.scale.y * s, mesh.scale.z * s); mesh.rotation.y = Math.random() * Math.PI * 2; }
     return mesh;
 }
 
@@ -160,7 +153,7 @@ const ghostMesh = new THREE.Mesh(new THREE.SphereGeometry(0.8, 16, 16), new THRE
 let ghostMixer = null; let ghostAnim = null;
 gLoader.load('ghost.glb', (gltf) => { const gModel = gltf.scene; gModel.scale.set(1.0, 1.0, 1.0); gModel.position.y = 0; ghostGroup.add(gModel); ghostMesh.visible = false; if(gltf.animations.length) { ghostMixer = new THREE.AnimationMixer(gModel); ghostAnim = ghostMixer.clipAction(gltf.animations[0]); ghostAnim.play(); } });
 
-// Fallback Generators
+// Fallback Generators (In case .glb files are missing)
 window.createHealthKit = function() { const group = new THREE.Group(); const box = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.6, 0.8), new THREE.MeshStandardMaterial({color: 0xffffff, roughness: 0.5})); const cross1 = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.2, 0.2), new THREE.MeshBasicMaterial({color: 0xff0000})); const cross2 = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.9), new THREE.MeshBasicMaterial({color: 0xff0000})); box.position.y = 0.3; cross1.position.y = 0.6; cross2.position.y = 0.6; group.add(box, cross1, cross2); group.traverse(c => { if(c.isMesh && currentGraphics !== 'LOW') { c.castShadow = true; }}); return group; }
 window.createFortGate = function() { const group = new THREE.Group(); const p1 = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 1.0, 7, 8), wallMat); p1.position.set(-2.5, 3.5, 0); if(currentGraphics !== 'LOW') p1.castShadow=true; group.add(p1); const p2 = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 1.0, 7, 8), wallMat); p2.position.set(2.5, 3.5, 0); if(currentGraphics !== 'LOW') p2.castShadow=true; group.add(p2); const beam = new THREE.Mesh(new THREE.BoxGeometry(7, 1.5, 2), wallMat); beam.position.set(0, 7.5, 0); if(currentGraphics !== 'LOW') beam.castShadow=true; group.add(beam); return group; } 
 
@@ -218,7 +211,12 @@ window.gridToWorld = function(gx, gz) { let s = window.gameState.size || window.
 window.findGhostPath = function(sx, sz, tx, tz) { let s = window.gameState.size || window.mazeSize || 13; if(sx === tx && sz === tz) return []; let queue = [{x: sx, z: sz, path: []}]; let visited = new Set([`${sx},${sz}`]); let dirs = [[0,-1],[0,1],[-1,0],[1,0]]; while(queue.length > 0) { let curr = queue.shift(); if(curr.x === tx && curr.z === tz) return curr.path; for(let d of dirs) { let nx = curr.x + d[0], nz = curr.z + d[1]; if(nx >= 0 && nx < s && nz >= 0 && nz < s) { if(window.gameState.map[nz][nx] !== 1 && !visited.has(`${nx},${nz}`)) { visited.add(`${nx},${nz}`); queue.push({x: nx, z: nz, path: [...curr.path, {x: nx, z: nz}]}); } } } } return []; }
 
 window.dropMedkit = function() { if (myStatus !== 'playing' || myHealth <= 25) return; myHealth -= 25; window.updateHealthUI(); const dropPos = myPlayer.position.clone(); const backward = new THREE.Vector3(0, 0, -2.5).applyEuler(new THREE.Euler(0, myPlayer.rotation.y, 0)); dropPos.add(backward); let grid = window.worldToGrid(dropPos.x, dropPos.z); if (window.gameState.map[grid.z] && window.gameState.map[grid.z][grid.x] === 1) { grid = window.worldToGrid(myPlayer.position.x, myPlayer.position.z); } const medId = `med_${Date.now()}_${Math.random()}`; window.spawnMedkitLocally(grid.x, grid.z, medId); if(!isSinglePlayer && window.sendEvent) window.sendEvent({ type: 'spawn_medkit', x: grid.x, z: grid.z, id: medId }); }
-window.spawnMedkitLocally = function(x, z, id) { let wPos = window.gridToWorld(x, z); const kit = window.createHealthKit(); kit.position.set(wPos.x, 0.5, wPos.z); let uniqueKey = id || `${x}_${z}_${Date.now()}`; healthMeshes[uniqueKey] = kit; mazeGroup.add(kit); }
+window.spawnMedkitLocally = function(x, z, id) { 
+    let wPos = window.gridToWorld(x, z); 
+    let kit = window.spawnModel('medkit', wPos.x, 0.5, wPos.z);
+    if(!kit) { kit = window.createHealthKit(); kit.position.set(wPos.x, 0.5, wPos.z); }
+    let uniqueKey = id || `${x}_${z}_${Date.now()}`; healthMeshes[uniqueKey] = kit; mazeGroup.add(kit); 
+}
 
 // ==========================================
 // 🚀 3D MAZE BUILDER ENGINE 🚀
@@ -237,19 +235,13 @@ window.buildMazeFromMap = function(mapArray, dynamicSize) {
     document.getElementById('joystick-wrapper').style.display = 'block';
     document.getElementById('spectate-btn').style.display = 'none'; document.getElementById('coin-counter').innerText = `COINS: 0`; playAnim('my', 'idle'); if(!isSinglePlayer) playAnim('opp', 'idle'); targetPitch = 0; targetRotation = 0; 
     
-    // 1. FLOOR (Asli GLB floor agar available ho)
-    if(window.GameModels.floor) {
-        let myFloor = window.spawnModel('floor', 0, -0.1, 0);
-        if(myFloor) { myFloor.scale.set(size, 1, size); mazeGroup.add(myFloor); }
-    }
-
-    // 2. JUNGLE ENVIRONMENT
+    // 🌳 JUNGLE ENVIRONMENT
     let envRange = offset + 100;
     for(let i=0; i<300; i++) { 
         let tx = (Math.random() - 0.5) * envRange * 2; let tz = (Math.random() - 0.5) * envRange * 2;
         if (tx < -offset || tx > offset || tz < -offset || tz > offset) {
-            if(window.GameModels.tree) { let tree = window.spawnModel('tree', tx, 0, tz, true); if(tree) mazeGroup.add(tree); }
-            if(window.GameModels.grass && Math.random() > 0.3) { let grass = window.spawnModel('grass', tx + 2, 0, tz + 2, true); if(grass) mazeGroup.add(grass); }
+            let tree = window.spawnModel('tree', tx, 0, tz, true); if(tree) mazeGroup.add(tree); 
+            if(Math.random() > 0.3) { let grass = window.spawnModel('grass', tx + 2, 0, tz + 2, true); if(grass) mazeGroup.add(grass); }
         }
     }
 
@@ -257,23 +249,25 @@ window.buildMazeFromMap = function(mapArray, dynamicSize) {
     for(let z=midFreeGrid.z-2; z<midFreeGrid.z+2; z++) { for(let x=midFreeGrid.x-2; x<midFreeGrid.x+2; x++) { if(mapArray[z] && mapArray[z][x] !== 1) { midFreeGrid = {x, z}; break; } } }
     let ghostSpawn = window.gridToWorld(midFreeGrid.x, midFreeGrid.z); ghostGroup.position.set(ghostSpawn.x, 0, ghostSpawn.z); 
 
-    // 3. MAZE & PROPS
+    // 🧱 MAZE & PROPS
     for(let z = 0; z < size; z++) { 
         for(let x = 0; x < size; x++) { 
             const posX = (x * wallUnit) - offset; const posZ = (z * wallUnit) - offset; 
             
             if(mapArray[z][x] === 1) { 
-                let wall = window.spawnModel('wall', posX, 0, posZ);
-                if(wall) { mazeGroup.add(wall); walls.push(new THREE.Box3().setFromObject(wall)); } 
-                else { let oldW = new THREE.Mesh(wallGeo, wallMat); oldW.position.set(posX, wallUnit/2, posZ); mazeGroup.add(oldW); walls.push(new THREE.Box3().setFromObject(oldW)); }
+                // Wall pehle jaisi (Box + Texture)
+                let oldW = new THREE.Mesh(wallGeo, wallMat); 
+                oldW.position.set(posX, wallUnit/2, posZ); 
+                mazeGroup.add(oldW); 
+                walls.push(new THREE.Box3().setFromObject(oldW));
             } 
             else { 
                 let rand = Math.random();
-                if(rand > 0.95 && window.GameModels.rock) { let rock = window.spawnModel('rock', posX + (Math.random()-0.5)*2, 0, posZ + (Math.random()-0.5)*2, true); if(rock) mazeGroup.add(rock); } 
-                else if(rand > 0.80 && window.GameModels.grass) { let grass = window.spawnModel('grass', posX + (Math.random()-0.5)*2, 0, posZ + (Math.random()-0.5)*2, true); if(grass) mazeGroup.add(grass); }
+                if(rand > 0.95) { let rock = window.spawnModel('rock', posX + (Math.random()-0.5)*2, 0, posZ + (Math.random()-0.5)*2, true); if(rock) mazeGroup.add(rock); } 
+                else if(rand > 0.80) { let grass = window.spawnModel('grass', posX + (Math.random()-0.5)*2, 0, posZ + (Math.random()-0.5)*2, true); if(grass) mazeGroup.add(grass); }
 
                 if(mapArray[z][x] === 3) { let coin = window.spawnModel('coin', posX, 1.0, posZ); if(!coin){ coin = window.createRealCoin(); coin.position.set(posX, 1.0, posZ); } coinMeshes[`${x}_${z}`] = coin; mazeGroup.add(coin); } 
-                if(mapArray[z][x] === 4) { const kit = window.createHealthKit(); kit.position.set(posX, 0.5, posZ); healthMeshes[`${x}_${z}`] = kit; mazeGroup.add(kit); }
+                if(mapArray[z][x] === 4) { let kit = window.spawnModel('medkit', posX, 0.5, posZ); if(!kit){ kit = window.createHealthKit(); kit.position.set(posX, 0.5, posZ); } healthMeshes[`${x}_${z}`] = kit; mazeGroup.add(kit); }
             } 
         } 
     } 
