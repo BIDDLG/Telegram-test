@@ -1,4 +1,4 @@
-// 🚀 game.js - ROYAL ESPORTS FULL 3D EDITION (VISIBLE & PERFECT SIZE) 🚀
+// 🚀 game.js - ROYAL ESPORTS 3D (HIGH QUALITY + LAG FIXED) 🚀
 
 const firebaseConfig = { apiKey: "AIzaSyD3bPF3B-a6yR8gQxKcKPBVq9-kSPn3MsY", authDomain: "maze-run-7c4b3.firebaseapp.com", projectId: "maze-run-7c4b3", storageBucket: "maze-run-7c4b3.firebasestorage.app", messagingSenderId: "919108275682", appId: "1:919108275682:web:c14c14061bced458f6fdbb" }; 
 if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); } 
@@ -78,19 +78,44 @@ let runSoundNode = null; let ghostAudioNode = null;
 function playInstantSound(name, loop = false, vol = 0.8) { if (!gameSounds[name]) return null; if (audioContext.state === 'suspended') audioContext.resume(); const source = audioContext.createBufferSource(); source.buffer = gameSounds[name]; source.loop = loop; const gainNode = audioContext.createGain(); gainNode.gain.value = vol; source.connect(gainNode); gainNode.connect(audioContext.destination); source.start(0); return source; } 
 
 // ==========================================
-// 🚀 THREE.JS ENGINE SETUP
+// 🚀 THREE.JS ENGINE SETUP (HIGH QUALITY WAPAS) 🚀
 // ==========================================
 const scene = new THREE.Scene(); const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000); 
+
+// QUALITY FIX: High Graphics wapas chalu kar diye
 const renderer = new THREE.WebGLRenderer({ antialias: currentGraphics === 'HIGH' }); 
-if (currentGraphics === 'HIGH') { renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap; } else if (currentGraphics === 'MEDIUM') { renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.BasicShadowMap; } else { renderer.setPixelRatio(1); renderer.shadowMap.enabled = false; }
+if (currentGraphics === 'HIGH') { 
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); 
+    renderer.shadowMap.enabled = true; 
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap; 
+} else if (currentGraphics === 'MEDIUM') { 
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); 
+    renderer.shadowMap.enabled = true; 
+    renderer.shadowMap.type = THREE.BasicShadowMap; 
+} else { 
+    renderer.setPixelRatio(1); 
+    renderer.shadowMap.enabled = false; 
+}
 renderer.setSize(window.innerWidth, window.innerHeight); 
 renderer.domElement.style.position = 'fixed'; renderer.domElement.style.top = '0'; renderer.domElement.style.left = '0'; renderer.domElement.style.zIndex = '-1';
 document.body.appendChild(renderer.domElement); 
 
 const textureLoader = new THREE.TextureLoader();
 const skyTex = textureLoader.load('sky.png'); const skyMat = new THREE.MeshBasicMaterial({ map: skyTex, side: THREE.BackSide, fog: false }); const skyBox = new THREE.Mesh(new THREE.SphereGeometry(300, 32, 32), skyMat); scene.add(skyBox); 
+
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.8); scene.add(ambientLight); 
-const mainLight = new THREE.DirectionalLight(0xffeedd, 1.0); mainLight.position.set(20, 60, 20); if(currentGraphics !== 'LOW') mainLight.castShadow = true; scene.add(mainLight); 
+const mainLight = new THREE.DirectionalLight(0xffeedd, 1.0); 
+mainLight.position.set(20, 60, 20); 
+if(currentGraphics !== 'LOW') { 
+    mainLight.castShadow = true; 
+    // SHADOW OPTIMIZATION: Sirf aas-paas ki cheezo par detail me shadow banegi, isse game smooth rahega
+    mainLight.shadow.mapSize.width = 1024; 
+    mainLight.shadow.mapSize.height = 1024;
+    mainLight.shadow.camera.near = 0.5; mainLight.shadow.camera.far = 150;
+    mainLight.shadow.camera.left = -50; mainLight.shadow.camera.right = 50;
+    mainLight.shadow.camera.top = 50; mainLight.shadow.camera.bottom = -50;
+}
+scene.add(mainLight); 
 scene.fog = new THREE.FogExp2(0x87cefa, currentGraphics === 'LOW' ? 0.02 : 0.015); 
 
 // 🧱 WALL & FLOOR TEXTURES
@@ -109,7 +134,7 @@ const menuEnvGroup = new THREE.Group(); scene.add(menuEnvGroup);
 const myPlayer = new THREE.Group(); scene.add(myPlayer); const opponentPlayer = new THREE.Group(); scene.add(opponentPlayer); opponentPlayer.position.set(1000, 1000, 1000); opponentPlayer.visible = false; myPlayer.add(myLantern); opponentPlayer.add(oppLantern); 
 
 // ==========================================
-// 🚀 SMART GLB LOADER (CENTERING & SIZE FIXES) 🚀
+// 🚀 SMART GLB LOADER (PERFECT SIZE + SMART SHADOWS) 🚀
 // ==========================================
 let myMixer = null, oppMixer = null; let myAnims = {}, oppAnims = {}; let myCurrentAnim = 'idle', oppCurrentAnim = 'idle'; let lobbyRotationY = 0; let isDraggingLobby = false; 
 const dracoLoader = new THREE.DRACOLoader(); dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/'); 
@@ -117,35 +142,32 @@ const dracoLoader = new THREE.DRACOLoader(); dracoLoader.setDecoderPath('https:/
 window.GameModels = { tree: null, coin: null, rock: null, grass: null, medkit: null };
 const gLoader = new THREE.GLTFLoader(); gLoader.setDRACOLoader(dracoLoader);
 
-// 🛠️ Updated Fixer: 
-// - centerIt = true: Sirf Coin aur Medkit ke liye taki hawa me theek se ghoomein.
-// - centerIt = false: Tree aur Rock ke liye taki wo zameen par khade rahein, underground na ghuse!
-function fixModel(gltf, targetSize, centerIt) {
+// SMART FIXER: enableShadows parameter add kiya hai.
+function fixModel(gltf, targetSize, centerIt, enableShadows) {
     let model = gltf.scene;
-    
     if (centerIt) {
         const box = new THREE.Box3().setFromObject(model);
         const center = box.getCenter(new THREE.Vector3());
         model.position.sub(center); 
     }
-
     let wrapper = new THREE.Group();
     wrapper.add(model);
     wrapper.scale.set(targetSize, targetSize, targetSize); 
-
     wrapper.traverse(c => { 
-        if(c.isMesh) { c.castShadow = false; c.receiveShadow = false; }
+        if(c.isMesh && currentGraphics !== 'LOW') { 
+            c.castShadow = enableShadows;    // Grass ki shadow band karne se speed double ho jayegi!
+            c.receiveShadow = enableShadows; 
+        } 
     });
     return wrapper;
 }
 
-// 🎛️ SIZE CONTROLS: Yahan se numbers change karke size badha/ghata sakta hai!
-// Tree, Rock, Grass ko centerIt=false diya hai taki zameen me na dhase.
-gLoader.load('tree.glb', (g) => { window.GameModels.tree = fixModel(g, 0.4, false); }, undefined, ()=>{});
-gLoader.load('coin.glb', (g) => { window.GameModels.coin = fixModel(g, 0.25, true); }, undefined, ()=>{});
-gLoader.load('rock.glb', (g) => { window.GameModels.rock = fixModel(g, 0.3, false); }, undefined, ()=>{});
-gLoader.load('grass.glb', (g) => { window.GameModels.grass = fixModel(g, 0.35, false); }, undefined, ()=>{});
-gLoader.load('medkit.glb', (g) => { window.GameModels.medkit = fixModel(g, 0.25, true); }, undefined, ()=>{});
+// 🔥 SIZES FIXED: Grass aur Medkit bade hain. Grass ki shadow OFF hai (Lag bachane ke liye).
+gLoader.load('tree.glb', (g) => { window.GameModels.tree = fixModel(g, 0.4, false, true); }, undefined, ()=>{});
+gLoader.load('coin.glb', (g) => { window.GameModels.coin = fixModel(g, 0.25, true, true); }, undefined, ()=>{});
+gLoader.load('rock.glb', (g) => { window.GameModels.rock = fixModel(g, 0.3, false, true); }, undefined, ()=>{});
+gLoader.load('grass.glb', (g) => { window.GameModels.grass = fixModel(g, 1.5, false, false); }, undefined, ()=>{}); // Shadow = FALSE (Lag Saver!)
+gLoader.load('medkit.glb', (g) => { window.GameModels.medkit = fixModel(g, 1.0, true, true); }, undefined, ()=>{});
 
 window.spawnModel = function(modelType, x, y, z, randomScale = false) {
     if(!window.GameModels[modelType]) return null;
@@ -186,7 +208,7 @@ function loadMyCharacter() {
         myPlayer.visible = true; appState = 'menu'; myCurrentAnim = 'idle'; if(myAnims['idle']) myAnims['idle'].reset().play(); 
         
         while(menuEnvGroup.children.length > 0) menuEnvGroup.remove(menuEnvGroup.children[0]); 
-        for(let wX = -10; wX <= 10; wX++) { for(let wY = 0; wY < 5; wY++) { const backW = new THREE.Mesh(wallGeo, wallMat); backW.position.set(wX * wallUnit, (wY * wallUnit) + (wallUnit/2), -15); menuEnvGroup.add(backW); } }
+        for(let wX = -10; wX <= 10; wX++) { for(let wY = 0; wY < 5; wY++) { const backW = new THREE.Mesh(wallGeo, wallMat); backW.position.set(wX * wallUnit, (wY * wallUnit) + (wallUnit/2), -15); if(currentGraphics !== 'LOW') { backW.castShadow = true; backW.receiveShadow = true; } menuEnvGroup.add(backW); } }
         setTimeout(() => { document.getElementById('loading-screen').style.display = 'none'; document.getElementById('main-menu').style.display = 'flex'; }, 500); 
     }; 
     files.forEach(file => { loader.load(`./${file}.glb`, (gltf) => { if (file.includes('idle')) { const model = gltf.scene; model.name = "charMesh"; model.scale.set(2.2, 2.2, 2.2); model.traverse(c => { if(c.isMesh && currentGraphics !== 'LOW') c.castShadow = true; }); myPlayer.add(model); myMixer = new THREE.AnimationMixer(model); } if(gltf.animations.length) tempClips[file] = gltf.animations[0]; }); }); 
@@ -246,13 +268,13 @@ window.buildMazeFromMap = function(mapArray, dynamicSize) {
     document.getElementById('joystick-wrapper').style.display = 'block';
     document.getElementById('spectate-btn').style.display = 'none'; document.getElementById('coin-counter').innerText = `COINS: 0`; playAnim('my', 'idle'); if(!isSinglePlayer) playAnim('opp', 'idle'); targetPitch = 0; targetRotation = 0; 
     
-    // 🌳 JUNGLE ENVIRONMENT
+    // 🌳 JUNGLE ENVIRONMENT (80 Trees: Perfect Balance)
     let envRange = offset + 100;
-    for(let i=0; i<40; i++) { 
+    for(let i=0; i<80; i++) { 
         let tx = (Math.random() - 0.5) * envRange * 2; let tz = (Math.random() - 0.5) * envRange * 2;
         if (tx < -offset || tx > offset || tz < -offset || tz > offset) {
             let tree = window.spawnModel('tree', tx, 0, tz, true); if(tree) mazeGroup.add(tree); 
-            if(Math.random() > 0.5) { let grass = window.spawnModel('grass', tx + 2, 0, tz + 2, true); if(grass) mazeGroup.add(grass); }
+            if(Math.random() > 0.4) { let grass = window.spawnModel('grass', tx + 2, 0, tz + 2, true); if(grass) mazeGroup.add(grass); }
         }
     }
 
@@ -268,6 +290,7 @@ window.buildMazeFromMap = function(mapArray, dynamicSize) {
             if(mapArray[z][x] === 1) { 
                 let oldW = new THREE.Mesh(wallGeo, wallMat); 
                 oldW.position.set(posX, wallUnit/2, posZ); 
+                if(currentGraphics !== 'LOW') { oldW.castShadow = true; oldW.receiveShadow = true; } // DEEWAR PAR SHADOW WAPAS AAGAYI
                 mazeGroup.add(oldW); 
                 walls.push(new THREE.Box3().setFromObject(oldW));
             } 
