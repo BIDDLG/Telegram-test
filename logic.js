@@ -1,4 +1,4 @@
-// 🚀 game.js - ROYAL ESPORTS FULL 3D EDITION (Optimized Props) 🚀
+// 🚀 game.js - ROYAL ESPORTS FULL 3D EDITION (LAG FREE & SIZE FIXED) 🚀
 
 const firebaseConfig = { apiKey: "AIzaSyD3bPF3B-a6yR8gQxKcKPBVq9-kSPn3MsY", authDomain: "maze-run-7c4b3.firebaseapp.com", projectId: "maze-run-7c4b3", storageBucket: "maze-run-7c4b3.firebasestorage.app", messagingSenderId: "919108275682", appId: "1:919108275682:web:c14c14061bced458f6fdbb" }; 
 if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); } 
@@ -15,16 +15,7 @@ let myProfile = { name: '', character: 'm1', password: '' }; let oppProfile = { 
 let appState = 'menu'; let isGameRunning = false; let hasGameEnded = false; 
 
 let currentGraphics = localStorage.getItem('mazeGraphics') || 'HIGH';
-window.toggleGraphics = function() {
-    let btn = document.getElementById('btn-graphics');
-    if(currentGraphics === 'HIGH') currentGraphics = 'LOW';
-    else if(currentGraphics === 'LOW') currentGraphics = 'MEDIUM';
-    else currentGraphics = 'HIGH';
-    localStorage.setItem('mazeGraphics', currentGraphics);
-    btn.innerHTML = SVG_COG + " " + currentGraphics;
-    alert("Graphics set to " + currentGraphics + ". Game will restart to apply changes.");
-    location.reload();
-}
+window.toggleGraphics = function() { let btn = document.getElementById('btn-graphics'); if(currentGraphics === 'HIGH') currentGraphics = 'LOW'; else if(currentGraphics === 'LOW') currentGraphics = 'MEDIUM'; else currentGraphics = 'HIGH'; localStorage.setItem('mazeGraphics', currentGraphics); btn.innerHTML = SVG_COG + " " + currentGraphics; alert("Graphics set to " + currentGraphics + ". Game will restart to apply changes."); location.reload(); }
 window.setAppState = function(state) { appState = state; } 
 window.addEventListener('beforeunload', () => { if(myProfile.name) window.db.collection('players').doc(myProfile.name).update({ online: false }); }); 
 
@@ -74,9 +65,6 @@ function setupLiveFriendsList() { window.db.collection('players').where('online'
 let incomingInviteRoom = null; function setupInviteListener() { window.db.collection('invites').doc(myProfile.name).onSnapshot((doc) => { if(doc.exists) { const data = doc.data(); if(data && data.roomId && appState === 'menu' && (Date.now() - data.time < 30000)) { document.getElementById('inviter-name').innerText = data.from.toUpperCase(); incomingInviteRoom = data.roomId; document.getElementById('invite-alert').style.display = 'flex'; } } }); } 
 window.getMyProfile = () => myProfile; window.setOppProfile = (p) => { oppProfile = p; }; window.getIncomingRoom = () => incomingInviteRoom; window.clearIncomingRoom = () => { incomingInviteRoom = null; window.db.collection('invites').doc(myProfile.name).delete(); }; 
 
-// ==========================================
-// 🚀 ANDROID AUDIO SYSTEM 🚀
-// ==========================================
 const AudioCtx = window.AudioContext || window.webkitAudioContext; const audioContext = new AudioCtx(); const gameSounds = {}; 
 function loadSound(name, url) { 
     return new Promise((resolve, reject) => {
@@ -85,14 +73,12 @@ function loadSound(name, url) {
         request.onerror = function() { reject(new Error("Network error")); }; request.send();
     });
 } 
-loadSound('coin', 'coin.mp3'); loadSound('run', 'run.mp3'); loadSound('win', 'win.mp3'); loadSound('lose', 'lose.mp3'); 
-loadSound('ghost_voice', 'ghost.mp3'); loadSound('ghost_hit', 'hit.mp3'); 
-
+loadSound('coin', 'coin.mp3'); loadSound('run', 'run.mp3'); loadSound('win', 'win.mp3'); loadSound('lose', 'lose.mp3'); loadSound('ghost_voice', 'ghost.mp3'); loadSound('ghost_hit', 'hit.mp3'); 
 let runSoundNode = null; let ghostAudioNode = null;
 function playInstantSound(name, loop = false, vol = 0.8) { if (!gameSounds[name]) return null; if (audioContext.state === 'suspended') audioContext.resume(); const source = audioContext.createBufferSource(); source.buffer = gameSounds[name]; source.loop = loop; const gainNode = audioContext.createGain(); gainNode.gain.value = vol; source.connect(gainNode); gainNode.connect(audioContext.destination); source.start(0); return source; } 
 
 // ==========================================
-// 🚀 THREE.JS SETUP 🚀
+// 🚀 THREE.JS ENGINE SETUP
 // ==========================================
 const scene = new THREE.Scene(); const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000); 
 const renderer = new THREE.WebGLRenderer({ antialias: currentGraphics === 'HIGH' }); 
@@ -107,7 +93,7 @@ const ambientLight = new THREE.AmbientLight(0xffffff, 0.8); scene.add(ambientLig
 const mainLight = new THREE.DirectionalLight(0xffeedd, 1.0); mainLight.position.set(20, 60, 20); if(currentGraphics !== 'LOW') mainLight.castShadow = true; scene.add(mainLight); 
 scene.fog = new THREE.FogExp2(0x87cefa, currentGraphics === 'LOW' ? 0.02 : 0.015); 
 
-// 🧱 STANDARD WALL & FLOOR TEXTURES (Restored exactly as original) 🧱
+// 🧱 WALL & FLOOR TEXTURES
 let wallUnit = 5; 
 const brickTex = textureLoader.load('wall.png'); brickTex.wrapS = THREE.RepeatWrapping; brickTex.wrapT = THREE.RepeatWrapping; brickTex.repeat.set(1, 1);
 const wallMat = new THREE.MeshStandardMaterial({ map: brickTex, roughness: 0.9 }); 
@@ -123,7 +109,7 @@ const menuEnvGroup = new THREE.Group(); scene.add(menuEnvGroup);
 const myPlayer = new THREE.Group(); scene.add(myPlayer); const opponentPlayer = new THREE.Group(); scene.add(opponentPlayer); opponentPlayer.position.set(1000, 1000, 1000); opponentPlayer.visible = false; myPlayer.add(myLantern); opponentPlayer.add(oppLantern); 
 
 // ==========================================
-// 🚀 GLB MODELS LOADER (ONLY 3D PROPS: TREE, ROCK, COIN, MEDKIT, GRASS) 🚀
+// 🚀 SMART GLB LOADER (LAG & SIZE FIXES) 🚀
 // ==========================================
 let myMixer = null, oppMixer = null; let myAnims = {}, oppAnims = {}; let myCurrentAnim = 'idle', oppCurrentAnim = 'idle'; let lobbyRotationY = 0; let isDraggingLobby = false; 
 const dracoLoader = new THREE.DRACOLoader(); dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/'); 
@@ -131,18 +117,41 @@ const dracoLoader = new THREE.DRACOLoader(); dracoLoader.setDecoderPath('https:/
 window.GameModels = { tree: null, coin: null, rock: null, grass: null, medkit: null };
 const gLoader = new THREE.GLTFLoader(); gLoader.setDRACOLoader(dracoLoader);
 
-// Props loading...
-gLoader.load('tree.glb', (gltf) => { window.GameModels.tree = gltf.scene; window.GameModels.tree.traverse(c => { if(c.isMesh && currentGraphics !== 'LOW') { c.castShadow = true; c.receiveShadow = true; }}); }, undefined, ()=>{});
-gLoader.load('coin.glb', (gltf) => { window.GameModels.coin = gltf.scene; window.GameModels.coin.traverse(c => { if(c.isMesh && currentGraphics !== 'LOW') { c.castShadow = true; }}); }, undefined, ()=>{});
-gLoader.load('rock.glb', (gltf) => { window.GameModels.rock = gltf.scene; window.GameModels.rock.traverse(c => { if(c.isMesh && currentGraphics !== 'LOW') { c.castShadow = true; c.receiveShadow = true; }}); }, undefined, ()=>{});
-gLoader.load('grass.glb', (gltf) => { window.GameModels.grass = gltf.scene; window.GameModels.grass.scale.set(1.5, 1.5, 1.5); }, undefined, ()=>{});
-gLoader.load('medkit.glb', (gltf) => { window.GameModels.medkit = gltf.scene; window.GameModels.medkit.traverse(c => { if(c.isMesh && currentGraphics !== 'LOW') { c.castShadow = true; }}); }, undefined, ()=>{});
+// 🛠️ Ye function Model ko chota karta hai, usko center me lata hai (Coin ghoomne ka fix), aur LAG hatata hai (Shadows OFF karke)
+function fixModel(gltf, targetSize) {
+    let model = gltf.scene;
+    
+    // Auto-Center Logic (Coin ajeeb nahi ghoomega ab)
+    const box = new THREE.Box3().setFromObject(model);
+    const center = box.getCenter(new THREE.Vector3());
+    model.position.sub(center); 
 
-// Helper for Object Spawning
+    let wrapper = new THREE.Group();
+    wrapper.add(model);
+    wrapper.scale.set(targetSize, targetSize, targetSize); // Size ko drastically chota kar diya (0.05 / 0.1)
+
+    // LAG FIX: Prop par shadow OFF rakhi hai
+    wrapper.traverse(c => { 
+        if(c.isMesh) { c.castShadow = false; c.receiveShadow = false; }
+    });
+    return wrapper;
+}
+
+// Yahan sizes set hain (agar phir bhi bade lage toh 0.08 ko 0.04 kar dena)
+gLoader.load('tree.glb', (g) => { window.GameModels.tree = fixModel(g, 0.08); }, undefined, ()=>{});
+gLoader.load('coin.glb', (g) => { window.GameModels.coin = fixModel(g, 0.05); }, undefined, ()=>{});
+gLoader.load('rock.glb', (g) => { window.GameModels.rock = fixModel(g, 0.05); }, undefined, ()=>{});
+gLoader.load('grass.glb', (g) => { window.GameModels.grass = fixModel(g, 0.06); }, undefined, ()=>{});
+gLoader.load('medkit.glb', (g) => { window.GameModels.medkit = fixModel(g, 0.05); }, undefined, ()=>{});
+
 window.spawnModel = function(modelType, x, y, z, randomScale = false) {
     if(!window.GameModels[modelType]) return null;
     let mesh = window.GameModels[modelType].clone(); mesh.position.set(x, y, z);
-    if(randomScale) { let s = 0.8 + Math.random() * 0.5; mesh.scale.set(mesh.scale.x * s, mesh.scale.y * s, mesh.scale.z * s); mesh.rotation.y = Math.random() * Math.PI * 2; }
+    if(randomScale) { 
+        let s = 0.8 + Math.random() * 0.5; // Natural variance
+        mesh.scale.set(mesh.scale.x * s, mesh.scale.y * s, mesh.scale.z * s); 
+        mesh.rotation.y = Math.random() * Math.PI * 2; 
+    }
     return mesh;
 }
 
@@ -153,9 +162,9 @@ const ghostMesh = new THREE.Mesh(new THREE.SphereGeometry(0.8, 16, 16), new THRE
 let ghostMixer = null; let ghostAnim = null;
 gLoader.load('ghost.glb', (gltf) => { const gModel = gltf.scene; gModel.scale.set(1.0, 1.0, 1.0); gModel.position.y = 0; ghostGroup.add(gModel); ghostMesh.visible = false; if(gltf.animations.length) { ghostMixer = new THREE.AnimationMixer(gModel); ghostAnim = ghostMixer.clipAction(gltf.animations[0]); ghostAnim.play(); } });
 
-// Fallback Generators (In case .glb files are missing)
-window.createHealthKit = function() { const group = new THREE.Group(); const box = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.6, 0.8), new THREE.MeshStandardMaterial({color: 0xffffff, roughness: 0.5})); const cross1 = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.2, 0.2), new THREE.MeshBasicMaterial({color: 0xff0000})); const cross2 = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.9), new THREE.MeshBasicMaterial({color: 0xff0000})); box.position.y = 0.3; cross1.position.y = 0.6; cross2.position.y = 0.6; group.add(box, cross1, cross2); group.traverse(c => { if(c.isMesh && currentGraphics !== 'LOW') { c.castShadow = true; }}); return group; }
-window.createFortGate = function() { const group = new THREE.Group(); const p1 = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 1.0, 7, 8), wallMat); p1.position.set(-2.5, 3.5, 0); if(currentGraphics !== 'LOW') p1.castShadow=true; group.add(p1); const p2 = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 1.0, 7, 8), wallMat); p2.position.set(2.5, 3.5, 0); if(currentGraphics !== 'LOW') p2.castShadow=true; group.add(p2); const beam = new THREE.Mesh(new THREE.BoxGeometry(7, 1.5, 2), wallMat); beam.position.set(0, 7.5, 0); if(currentGraphics !== 'LOW') beam.castShadow=true; group.add(beam); return group; } 
+// Fallback Generators
+window.createHealthKit = function() { const group = new THREE.Group(); const box = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.6, 0.8), new THREE.MeshStandardMaterial({color: 0xffffff, roughness: 0.5})); const cross1 = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.2, 0.2), new THREE.MeshBasicMaterial({color: 0xff0000})); const cross2 = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.9), new THREE.MeshBasicMaterial({color: 0xff0000})); box.position.y = 0.3; cross1.position.y = 0.6; cross2.position.y = 0.6; group.add(box, cross1, cross2); return group; }
+window.createFortGate = function() { const group = new THREE.Group(); const p1 = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 1.0, 7, 8), wallMat); p1.position.set(-2.5, 3.5, 0); group.add(p1); const p2 = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 1.0, 7, 8), wallMat); p2.position.set(2.5, 3.5, 0); group.add(p2); const beam = new THREE.Mesh(new THREE.BoxGeometry(7, 1.5, 2), wallMat); beam.position.set(0, 7.5, 0); group.add(beam); return group; } 
 
 let myHealth = 100; let oppHealth = 100; let ghostAttackCooldown = 0; let currentGhostSpeed = 0.12; let ghostCurrentPath = []; let lastPathCalcTime = 0;
 window.updateHealthUI = function() { let hFill = document.getElementById('health-fill'); let hText = document.getElementById('health-text'); if(hFill) { hFill.style.width = Math.min(100, (myHealth / 200) * 100) + '%'; if(myHealth > 100) { hFill.style.background = '#00ff88'; hFill.style.boxShadow = '0 0 10px #00ff88'; } else { hFill.style.background = '#ff4444'; hFill.style.boxShadow = '0 0 10px #ff0000'; } } if(hText) hText.innerText = Math.floor(myHealth) + '%'; if(!isSinglePlayer && window.sendEvent) window.sendEvent({ type: 'health', val: myHealth }); }
@@ -174,7 +183,7 @@ function loadMyCharacter() {
         myPlayer.visible = true; appState = 'menu'; myCurrentAnim = 'idle'; if(myAnims['idle']) myAnims['idle'].reset().play(); 
         
         while(menuEnvGroup.children.length > 0) menuEnvGroup.remove(menuEnvGroup.children[0]); 
-        for(let wX = -10; wX <= 10; wX++) { for(let wY = 0; wY < 5; wY++) { const backW = new THREE.Mesh(wallGeo, wallMat); backW.position.set(wX * wallUnit, (wY * wallUnit) + (wallUnit/2), -15); if(currentGraphics !== 'LOW') { backW.castShadow = true; backW.receiveShadow = true; } menuEnvGroup.add(backW); } }
+        for(let wX = -10; wX <= 10; wX++) { for(let wY = 0; wY < 5; wY++) { const backW = new THREE.Mesh(wallGeo, wallMat); backW.position.set(wX * wallUnit, (wY * wallUnit) + (wallUnit/2), -15); menuEnvGroup.add(backW); } }
         setTimeout(() => { document.getElementById('loading-screen').style.display = 'none'; document.getElementById('main-menu').style.display = 'flex'; }, 500); 
     }; 
     files.forEach(file => { loader.load(`./${file}.glb`, (gltf) => { if (file.includes('idle')) { const model = gltf.scene; model.name = "charMesh"; model.scale.set(2.2, 2.2, 2.2); model.traverse(c => { if(c.isMesh && currentGraphics !== 'LOW') c.castShadow = true; }); myPlayer.add(model); myMixer = new THREE.AnimationMixer(model); } if(gltf.animations.length) tempClips[file] = gltf.animations[0]; }); }); 
@@ -182,7 +191,7 @@ function loadMyCharacter() {
 
 window.currentOppChar = null; 
 window.loadOpponentCharacter = function(char, callback) { 
-    if(window.currentOppChar === char) { if(callback) callback(); return; } window.currentOppChar = char; document.getElementById('conn-status').innerText = "Downloading Player..."; let oldMesh = opponentPlayer.getObjectByName("charMesh"); if(oldMesh) opponentPlayer.remove(oldMesh); const files = [`${char}_idle`, `${char}_run`, `${char}_win`, `${char}_lose`]; let tempClips = {}; const manager = new THREE.LoadingManager(); const loader = new THREE.GLTFLoader(manager); loader.setDRACOLoader(dracoLoader); 
+    if(window.currentOppChar === char) { if(callback) callback(); return; } window.currentOppChar = char; let oldMesh = opponentPlayer.getObjectByName("charMesh"); if(oldMesh) opponentPlayer.remove(oldMesh); const files = [`${char}_idle`, `${char}_run`, `${char}_win`, `${char}_lose`]; let tempClips = {}; const manager = new THREE.LoadingManager(); const loader = new THREE.GLTFLoader(manager); loader.setDRACOLoader(dracoLoader); 
     manager.onLoad = function () { 
         if(tempClips[`${char}_idle`]) oppAnims['idle'] = oppMixer.clipAction(tempClips[`${char}_idle`]); 
         if(tempClips[`${char}_run`]) oppAnims['run'] = oppMixer.clipAction(tempClips[`${char}_run`]); 
@@ -204,7 +213,6 @@ document.addEventListener('touchstart', (e) => { for(let t of e.changedTouches) 
 
 let mazeSize = 13; let walls = []; let mazeGroup = new THREE.Group(); scene.add(mazeGroup); let coinMeshes = {}; let healthMeshes = {}; window.gameState = { map: null }; let isSinglePlayer = true; let opponentData = null; let myStatus = 'playing'; let oppStatus = 'playing'; let myCoins = 0; let oppCoins = 0; let isSpectating = false; 
 window.setSinglePlayerFlag = (val) => { isSinglePlayer = val; }; window.setOpponentData = (data) => { opponentData = data; }; 
-window.toggleSpectate = function(e) { if(e) { e.preventDefault(); e.stopPropagation(); } isSpectating = !isSpectating; const btn = document.getElementById('spectate-btn'); if(isSpectating) { btn.innerText = "STOP SPECTATING"; btn.style.background = 'rgba(255, 0, 0, 0.6)'; btn.style.borderColor = '#ff4444'; } else { btn.innerText = "WATCH OPPONENT"; btn.style.background = 'rgba(0, 200, 255, 0.6)'; btn.style.borderColor = '#00ffff'; } }
 
 window.worldToGrid = function(wx, wz) { let s = window.gameState.size || window.mazeSize || 13; let offset = (s * wallUnit) / 2; let x = Math.round((wx + offset) / wallUnit); let z = Math.round((wz + offset) / wallUnit); return {x: Math.max(0, Math.min(s - 1, x)), z: Math.max(0, Math.min(s - 1, z))}; }
 window.gridToWorld = function(gx, gz) { let s = window.gameState.size || window.mazeSize || 13; let offset = (s * wallUnit) / 2; return {x: (gx * wallUnit) - offset, z: (gz * wallUnit) - offset}; }
@@ -219,7 +227,7 @@ window.spawnMedkitLocally = function(x, z, id) {
 }
 
 // ==========================================
-// 🚀 3D MAZE BUILDER ENGINE 🚀
+// 🚀 3D MAZE BUILDER ENGINE (LAG FIX) 🚀
 // ==========================================
 window.buildMazeFromMap = function(mapArray, dynamicSize) { 
     if(dynamicSize) { window.mazeSize = dynamicSize; window.gameState.size = dynamicSize; }
@@ -235,13 +243,13 @@ window.buildMazeFromMap = function(mapArray, dynamicSize) {
     document.getElementById('joystick-wrapper').style.display = 'block';
     document.getElementById('spectate-btn').style.display = 'none'; document.getElementById('coin-counter').innerText = `COINS: 0`; playAnim('my', 'idle'); if(!isSinglePlayer) playAnim('opp', 'idle'); targetPitch = 0; targetRotation = 0; 
     
-    // 🌳 JUNGLE ENVIRONMENT
+    // 🌳 JUNGLE ENVIRONMENT (LAG FIX: Ab sirf 40 ped aayenge, 300 nahi)
     let envRange = offset + 100;
-    for(let i=0; i<300; i++) { 
+    for(let i=0; i<40; i++) { 
         let tx = (Math.random() - 0.5) * envRange * 2; let tz = (Math.random() - 0.5) * envRange * 2;
         if (tx < -offset || tx > offset || tz < -offset || tz > offset) {
             let tree = window.spawnModel('tree', tx, 0, tz, true); if(tree) mazeGroup.add(tree); 
-            if(Math.random() > 0.3) { let grass = window.spawnModel('grass', tx + 2, 0, tz + 2, true); if(grass) mazeGroup.add(grass); }
+            if(Math.random() > 0.5) { let grass = window.spawnModel('grass', tx + 2, 0, tz + 2, true); if(grass) mazeGroup.add(grass); }
         }
     }
 
@@ -255,16 +263,16 @@ window.buildMazeFromMap = function(mapArray, dynamicSize) {
             const posX = (x * wallUnit) - offset; const posZ = (z * wallUnit) - offset; 
             
             if(mapArray[z][x] === 1) { 
-                // Wall pehle jaisi (Box + Texture)
                 let oldW = new THREE.Mesh(wallGeo, wallMat); 
                 oldW.position.set(posX, wallUnit/2, posZ); 
                 mazeGroup.add(oldW); 
                 walls.push(new THREE.Box3().setFromObject(oldW));
             } 
             else { 
+                // Patthar aur ghas bahut kam kar diye lag fix karne ke liye
                 let rand = Math.random();
-                if(rand > 0.95) { let rock = window.spawnModel('rock', posX + (Math.random()-0.5)*2, 0, posZ + (Math.random()-0.5)*2, true); if(rock) mazeGroup.add(rock); } 
-                else if(rand > 0.80) { let grass = window.spawnModel('grass', posX + (Math.random()-0.5)*2, 0, posZ + (Math.random()-0.5)*2, true); if(grass) mazeGroup.add(grass); }
+                if(rand > 0.98) { let rock = window.spawnModel('rock', posX + (Math.random()-0.5)*2, 0, posZ + (Math.random()-0.5)*2, true); if(rock) mazeGroup.add(rock); } 
+                else if(rand > 0.90) { let grass = window.spawnModel('grass', posX + (Math.random()-0.5)*2, 0, posZ + (Math.random()-0.5)*2, true); if(grass) mazeGroup.add(grass); }
 
                 if(mapArray[z][x] === 3) { let coin = window.spawnModel('coin', posX, 1.0, posZ); if(!coin){ coin = window.createRealCoin(); coin.position.set(posX, 1.0, posZ); } coinMeshes[`${x}_${z}`] = coin; mazeGroup.add(coin); } 
                 if(mapArray[z][x] === 4) { let kit = window.spawnModel('medkit', posX, 0.5, posZ); if(!kit){ kit = window.createHealthKit(); kit.position.set(posX, 0.5, posZ); } healthMeshes[`${x}_${z}`] = kit; mazeGroup.add(kit); }
