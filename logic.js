@@ -1,4 +1,4 @@
-// 🚀 game.js - ROYAL ESPORTS FULL 3D EDITION (ULTIMATE ZERO LAG + SMART GRAPHICS) 🚀
+// 🚀 game.js - ROYAL ESPORTS 3D (ULTRA HD REALISTIC + ZERO LAG SYSTEM) 🚀
 
 const firebaseConfig = { apiKey: "AIzaSyD3bPF3B-a6yR8gQxKcKPBVq9-kSPn3MsY", authDomain: "maze-run-7c4b3.firebaseapp.com", projectId: "maze-run-7c4b3", storageBucket: "maze-run-7c4b3.firebasestorage.app", messagingSenderId: "919108275682", appId: "1:919108275682:web:c14c14061bced458f6fdbb" }; 
 if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); } 
@@ -72,14 +72,15 @@ let runSoundNode = null; let ghostAudioNode = null;
 function playInstantSound(name, loop = false, vol = 0.8) { if (!gameSounds[name]) return null; if (audioContext.state === 'suspended') audioContext.resume(); const source = audioContext.createBufferSource(); source.buffer = gameSounds[name]; source.loop = loop; const gainNode = audioContext.createGain(); gainNode.gain.value = vol; source.connect(gainNode); gainNode.connect(audioContext.destination); source.start(0); return source; } 
 
 // ==========================================
-// 🚀 SMART 3D ENGINE SETUP (LAG KILLER) 🚀
+// 🚀 SMART 3D ENGINE (DYNAMIC PLAYER LIGHTING) 🚀
 // ==========================================
 const scene = new THREE.Scene(); const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000); 
-const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "high-performance" }); // Performance Boost
+
+const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "high-performance" }); 
 if (currentGraphics === 'HIGH') { 
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); // Mobile me 2x GPU ko mar deta hai, 1.5 is perfect.
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); 
     renderer.shadowMap.enabled = true; 
-    renderer.shadowMap.type = THREE.PCFShadowMap; // Soft shadow ki jagah normal shadow, extra fast.
+    renderer.shadowMap.type = THREE.PCFShadowMap; 
 } else { 
     renderer.setPixelRatio(1); renderer.shadowMap.enabled = false; 
 }
@@ -89,19 +90,28 @@ document.body.appendChild(renderer.domElement);
 
 const textureLoader = new THREE.TextureLoader();
 const skyTex = textureLoader.load('sky.png'); const skyMat = new THREE.MeshBasicMaterial({ map: skyTex, side: THREE.BackSide, fog: false }); const skyBox = new THREE.Mesh(new THREE.SphereGeometry(300, 32, 32), skyMat); scene.add(skyBox); 
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.9); scene.add(ambientLight); 
-const mainLight = new THREE.DirectionalLight(0xffeedd, 0.8); mainLight.position.set(20, 60, 20); 
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.8); scene.add(ambientLight); 
+
+// 🔥 THE MAGIC LIGHT: Ye light player ke sath chalegi!
+const mainLight = new THREE.DirectionalLight(0xffeedd, 1.2); 
+scene.add(mainLight); 
+scene.add(mainLight.target); // Target zaroori hai is magic ke liye
+
 if(currentGraphics !== 'LOW') { 
     mainLight.castShadow = true; 
-    mainLight.shadow.mapSize.width = 512; // Shadow resolution optimized for zero lag
-    mainLight.shadow.mapSize.height = 512; 
-    mainLight.shadow.camera.near = 0.5; mainLight.shadow.camera.far = 100; 
-    mainLight.shadow.camera.left = -40; mainLight.shadow.camera.right = 40; 
-    mainLight.shadow.camera.top = 40; mainLight.shadow.camera.bottom = -40; 
+    mainLight.shadow.mapSize.width = 1024; // High Quality
+    mainLight.shadow.mapSize.height = 1024; 
+    mainLight.shadow.camera.near = 0.5; 
+    mainLight.shadow.camera.far = 100; 
+    // MAGIC: Sirf 25 meter ka area render hoga, baki map me no lag!
+    mainLight.shadow.camera.left = -25; 
+    mainLight.shadow.camera.right = 25; 
+    mainLight.shadow.camera.top = 25; 
+    mainLight.shadow.camera.bottom = -25; 
 }
-scene.add(mainLight); scene.fog = new THREE.FogExp2(0x87cefa, currentGraphics === 'LOW' ? 0.02 : 0.018); 
+scene.fog = new THREE.FogExp2(0x87cefa, currentGraphics === 'LOW' ? 0.02 : 0.015); 
 
-// 🧱 WALL & FLOOR
+// 🧱 WALL & FLOOR TEXTURES
 let wallUnit = 5; 
 const brickTex = textureLoader.load('wall.png'); brickTex.wrapS = THREE.RepeatWrapping; brickTex.wrapT = THREE.RepeatWrapping; brickTex.repeat.set(1, 1);
 const wallMat = new THREE.MeshStandardMaterial({ map: brickTex, roughness: 0.9 }); const wallGeo = new THREE.BoxGeometry(wallUnit, wallUnit, wallUnit);
@@ -112,7 +122,7 @@ floorMesh.rotation.x = -Math.PI / 2; if(currentGraphics !== 'LOW') floorMesh.rec
 const menuEnvGroup = new THREE.Group(); scene.add(menuEnvGroup); const myPlayer = new THREE.Group(); scene.add(myPlayer); const opponentPlayer = new THREE.Group(); scene.add(opponentPlayer); opponentPlayer.position.set(1000, 1000, 1000); opponentPlayer.visible = false; 
 
 // ==========================================
-// 🚀 INSTANCED MESH LOADER (ABSOLUTE ZERO LAG) 🚀
+// 🚀 GLB LOADER (ALL SHADOWS ENABLED WAPAS) 🚀
 // ==========================================
 let myMixer = null, oppMixer = null; let myAnims = {}, oppAnims = {}; let myCurrentAnim = 'idle', oppCurrentAnim = 'idle'; let lobbyRotationY = 0; let isDraggingLobby = false; 
 const dracoLoader = new THREE.DRACOLoader(); dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/'); 
@@ -121,19 +131,16 @@ const gLoader = new THREE.GLTFLoader(); gLoader.setDRACOLoader(dracoLoader);
 window.GameModels = { tree: null, coin: null, rock: null, grass: null, medkit: null };
 window.PropSizes = { tree: 0.4, rock: 0.3, grass: 1.5, coin: 0.25, medkit: 1.0 }; 
 
-// Dynamic Models (Items to pick up)
 function prepDynamicModel(gltf, targetSize, centerIt) {
     let model = gltf.scene;
     if (centerIt) { const box = new THREE.Box3().setFromObject(model); const center = box.getCenter(new THREE.Vector3()); model.position.sub(center); }
     let wrapper = new THREE.Group(); wrapper.add(model); wrapper.scale.set(targetSize, targetSize, targetSize); 
-    // ZERO LAG FIX: Faltu shadows off for small items
-    wrapper.traverse(c => { if(c.isMesh) { c.castShadow = false; c.receiveShadow = false; } });
+    wrapper.traverse(c => { if(c.isMesh && currentGraphics !== 'LOW') { c.castShadow = true; c.receiveShadow = true; } });
     return wrapper;
 }
+
 gLoader.load('coin.glb', (g) => { window.GameModels.coin = prepDynamicModel(g, window.PropSizes.coin, true); }, undefined, ()=>{});
 gLoader.load('medkit.glb', (g) => { window.GameModels.medkit = prepDynamicModel(g, window.PropSizes.medkit, true); }, undefined, ()=>{});
-
-// Static Models
 gLoader.load('tree.glb', (g) => { window.GameModels.tree = g.scene; }, undefined, ()=>{});
 gLoader.load('rock.glb', (g) => { window.GameModels.rock = g.scene; }, undefined, ()=>{});
 gLoader.load('grass.glb', (g) => { window.GameModels.grass = g.scene; }, undefined, ()=>{});
@@ -143,7 +150,7 @@ const ghostMesh = new THREE.Mesh(new THREE.SphereGeometry(0.8, 16, 16), new THRE
 let ghostMixer = null; let ghostAnim = null;
 gLoader.load('ghost.glb', (gltf) => { const gModel = gltf.scene; gModel.scale.set(1.0, 1.0, 1.0); gModel.position.y = 0; ghostGroup.add(gModel); ghostMesh.visible = false; if(gltf.animations.length) { ghostMixer = new THREE.AnimationMixer(gModel); ghostAnim = ghostMixer.clipAction(gltf.animations[0]); ghostAnim.play(); } });
 
-// INSTANCER (Photocopy Machine)
+// INSTANCER (Ab har Tree par Shadow Wapas Aayegi)
 function buildInstancedProps(type, dataArray) {
     let baseModel = window.GameModels[type];
     if(!baseModel || dataArray.length === 0) return;
@@ -154,29 +161,25 @@ function buildInstancedProps(type, dataArray) {
     baseModel.traverse(c => {
         if(c.isMesh) {
             let imesh = new THREE.InstancedMesh(c.geometry, c.material, dataArray.length);
-            // ZERO LAG MAGIC: Phone me hundreds of trees ki shadow death hai. All shadows OFF for environment.
-            imesh.castShadow = false; 
-            imesh.receiveShadow = false; 
-            
+            if(currentGraphics !== 'LOW') { 
+                imesh.castShadow = true;     // SHADOWS ON!
+                imesh.receiveShadow = true; 
+            }
             let dummy = new THREE.Object3D();
             for(let i=0; i<dataArray.length; i++) {
                 let d = dataArray[i];
-                dummy.position.set(d.x, d.y, d.z);
-                dummy.rotation.y = d.rot;
-                let s = baseSize * d.scale;
-                dummy.scale.set(s, s, s);
-                dummy.updateMatrix();
+                dummy.position.set(d.x, d.y, d.z); dummy.rotation.y = d.rot;
+                let s = baseSize * d.scale; dummy.scale.set(s, s, s); dummy.updateMatrix();
                 let finalMat = new THREE.Matrix4().multiplyMatrices(dummy.matrix, c.matrixWorld);
                 imesh.setMatrixAt(i, finalMat);
             }
-            imesh.instanceMatrix.needsUpdate = true;
-            window.mazeGroup.add(imesh);
+            imesh.instanceMatrix.needsUpdate = true; window.mazeGroup.add(imesh);
         }
     });
 }
 
 // Fallbacks
-window.createHealthKit = function() { const group = new THREE.Group(); const box = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.6, 0.8), new THREE.MeshStandardMaterial({color: 0xffffff})); const c1 = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.2, 0.2), new THREE.MeshBasicMaterial({color: 0xff0000})); const c2 = new Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.9), new THREE.MeshBasicMaterial({color: 0xff0000})); box.position.y = 0.3; c1.position.y = 0.6; c2.position.y = 0.6; group.add(box, c1, c2); return group; }
+window.createHealthKit = function() { const group = new THREE.Group(); const box = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.6, 0.8), new THREE.MeshStandardMaterial({color: 0xffffff})); const c1 = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.2, 0.2), new THREE.MeshBasicMaterial({color: 0xff0000})); const c2 = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.9), new THREE.MeshBasicMaterial({color: 0xff0000})); box.position.y = 0.3; c1.position.y = 0.6; c2.position.y = 0.6; group.add(box, c1, c2); return group; }
 window.createRealCoin = function() { const group = new THREE.Group(); const rim = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.08, 16, 32), new THREE.MeshStandardMaterial({color: 0xffd700})); const inner = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, 0.1, 32), new THREE.MeshStandardMaterial({color: 0xffaa00})); inner.rotation.x = Math.PI/2; group.add(rim, inner); return group; }
 window.createFortGate = function() { const group = new THREE.Group(); const p1 = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 1.0, 7, 8), wallMat); p1.position.set(-2.5, 3.5, 0); group.add(p1); const p2 = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 1.0, 7, 8), wallMat); p2.position.set(2.5, 3.5, 0); group.add(p2); const beam = new THREE.Mesh(new THREE.BoxGeometry(7, 1.5, 2), wallMat); beam.position.set(0, 7.5, 0); group.add(beam); return group; } 
 
@@ -237,7 +240,7 @@ window.dropMedkit = function() { if (myStatus !== 'playing' || myHealth <= 25) r
 window.spawnMedkitLocally = function(x, z, id) { let wPos = window.gridToWorld(x, z); let kit = window.GameModels.medkit ? window.GameModels.medkit.clone() : window.createHealthKit(); kit.position.set(wPos.x, 0.5, wPos.z); let uniqueKey = id || `${x}_${z}_${Date.now()}`; healthMeshes[uniqueKey] = kit; window.mazeGroup.add(kit); }
 
 // ==========================================
-// 🚀 3D MAZE BUILDER ENGINE 🚀
+// 🚀 3D MAZE BUILDER (LUSH JUNGLE WAPAS) 🚀
 // ==========================================
 window.buildMazeFromMap = function(mapArray, dynamicSize) { 
     if(dynamicSize) { window.mazeSize = dynamicSize; window.gameState.size = dynamicSize; }
@@ -254,13 +257,13 @@ window.buildMazeFromMap = function(mapArray, dynamicSize) {
     
     let instData = { tree: [], rock: [], grass: [] };
 
-    // Density optimized for speed (60 trees is perfect for mobile)
+    // 🌳 150 Trees = Lush Jungle with PC-like feel!
     let envRange = offset + 100;
-    for(let i=0; i<60; i++) { 
+    for(let i=0; i<150; i++) { 
         let tx = (Math.random() - 0.5) * envRange * 2; let tz = (Math.random() - 0.5) * envRange * 2;
         if (tx < -offset || tx > offset || tz < -offset || tz > offset) {
             instData.tree.push({x: tx, y: 0, z: tz, rot: Math.random() * Math.PI*2, scale: 0.8 + Math.random() * 0.5});
-            if(Math.random() > 0.3) instData.grass.push({x: tx+2, y: 0, z: tz+2, rot: Math.random() * Math.PI*2, scale: 0.8 + Math.random() * 0.5});
+            if(Math.random() > 0.4) instData.grass.push({x: tx+2, y: 0, z: tz+2, rot: Math.random() * Math.PI*2, scale: 0.8 + Math.random() * 0.5});
         }
     }
 
@@ -275,14 +278,14 @@ window.buildMazeFromMap = function(mapArray, dynamicSize) {
             if(mapArray[z][x] === 1) { 
                 let oldW = new THREE.Mesh(wallGeo, wallMat); 
                 oldW.position.set(posX, wallUnit/2, posZ); 
-                if(currentGraphics !== 'LOW') { oldW.castShadow = true; oldW.receiveShadow = true; } // WALLS GET SHADOW
+                if(currentGraphics !== 'LOW') { oldW.castShadow = true; oldW.receiveShadow = true; } // WALLS HAVE SHADOW
                 window.mazeGroup.add(oldW); 
                 walls.push(new THREE.Box3().setFromObject(oldW));
             } 
             else { 
                 let rand = Math.random();
-                if(rand > 0.98) instData.rock.push({x: posX + (Math.random()-0.5)*2, y: 0, z: posZ + (Math.random()-0.5)*2, rot: Math.random()*Math.PI*2, scale: 0.8+Math.random()*0.5});
-                else if(rand > 0.90) instData.grass.push({x: posX + (Math.random()-0.5)*2, y: 0, z: posZ + (Math.random()-0.5)*2, rot: Math.random()*Math.PI*2, scale: 0.8+Math.random()*0.5});
+                if(rand > 0.95) instData.rock.push({x: posX + (Math.random()-0.5)*2, y: 0, z: posZ + (Math.random()-0.5)*2, rot: Math.random()*Math.PI*2, scale: 0.8+Math.random()*0.5});
+                else if(rand > 0.85) instData.grass.push({x: posX + (Math.random()-0.5)*2, y: 0, z: posZ + (Math.random()-0.5)*2, rot: Math.random()*Math.PI*2, scale: 0.8+Math.random()*0.5});
 
                 if(mapArray[z][x] === 3) { let coin = window.GameModels.coin ? window.GameModels.coin.clone() : window.createRealCoin(); coin.position.set(posX, 1.0, posZ); coinMeshes[`${x}_${z}`] = coin; window.mazeGroup.add(coin); } 
                 if(mapArray[z][x] === 4) { let kit = window.GameModels.medkit ? window.GameModels.medkit.clone() : window.createHealthKit(); kit.position.set(posX, 0.5, posZ); healthMeshes[`${x}_${z}`] = kit; window.mazeGroup.add(kit); }
@@ -344,6 +347,10 @@ function animate() {
     else if (appState === 'lobby') { camera.position.lerp(new THREE.Vector3(0, 3.8, 8.0), 0.1); camera.lookAt(0, 1.5, 0); myPlayer.position.lerp(new THREE.Vector3(-1.2, 0, 0), 0.1); myPlayer.rotation.y = lobbyRotationY; playAnim('my', 'idle'); if(!isSinglePlayer) { opponentPlayer.visible = true; opponentPlayer.position.lerp(new THREE.Vector3(1.2, 0, 0), 0.1); opponentPlayer.rotation.y = lobbyRotationY; playAnim('opp', 'idle'); } if(window.mazeGroup) window.mazeGroup.visible = false; ghostGroup.visible = false; menuEnvGroup.visible = true; skyBox.position.copy(camera.position); } 
     else if (appState === 'playing') { 
         menuEnvGroup.visible = false; if(window.mazeGroup) window.mazeGroup.visible = true; skyBox.position.copy(camera.position); let currentSize = window.gameState.size || window.mazeSize || 13;
+
+        // 🔥 THE MAGIC: Suraj ab tere Player ke sath chalega, Lag Khatam!
+        mainLight.position.set(myPlayer.position.x + 20, 60, myPlayer.position.z + 20);
+        mainLight.target.position.copy(myPlayer.position);
         
         if(isGameRunning) { 
             if(!ghostAudioNode && typeof playInstantSound === 'function') { ghostAudioNode = playInstantSound('ghost_voice', true, 0.5); }
