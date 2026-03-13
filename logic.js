@@ -1,4 +1,4 @@
-// 🚀 game.js - ROYAL ESPORTS FULL 3D EDITION (ORIGINAL ULTRA HD + ZERO LAG INSTANCING) 🚀
+// 🚀 game.js - ROYAL ESPORTS FULL 3D (ULTRA HD + LOW-POLY OPTIMIZED) 🚀
 
 const firebaseConfig = { apiKey: "AIzaSyD3bPF3B-a6yR8gQxKcKPBVq9-kSPn3MsY", authDomain: "maze-run-7c4b3.firebaseapp.com", projectId: "maze-run-7c4b3", storageBucket: "maze-run-7c4b3.firebasestorage.app", messagingSenderId: "919108275682", appId: "1:919108275682:web:c14c14061bced458f6fdbb" }; 
 if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); } 
@@ -72,16 +72,16 @@ let runSoundNode = null; let ghostAudioNode = null;
 function playInstantSound(name, loop = false, vol = 0.8) { if (!gameSounds[name]) return null; if (audioContext.state === 'suspended') audioContext.resume(); const source = audioContext.createBufferSource(); source.buffer = gameSounds[name]; source.loop = loop; const gainNode = audioContext.createGain(); gainNode.gain.value = vol; source.connect(gainNode); gainNode.connect(audioContext.destination); source.start(0); return source; } 
 
 // ==========================================
-// 🚀 ORIGINAL HIGH QUALITY THREE.JS SETUP 🚀
+// 🚀 THREE.JS ORIGINAL HIGH QUALITY SETUP 🚀
 // ==========================================
 const scene = new THREE.Scene(); const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000); 
 
-// TERA ORIGINAL RENDERER WAPAS (HD QUALITY, NO BLUR)
-const renderer = new THREE.WebGLRenderer({ antialias: currentGraphics === 'HIGH' }); 
+// Blur Hata Diya - Original Crisp Graphics Wapas!
+const renderer = new THREE.WebGLRenderer({ antialias: currentGraphics === 'HIGH', powerPreference: "high-performance" }); 
 if (currentGraphics === 'HIGH') { 
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); 
     renderer.shadowMap.enabled = true; 
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap; 
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Asli Soft Shadows
 } else if (currentGraphics === 'MEDIUM') { 
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); 
     renderer.shadowMap.enabled = true; 
@@ -97,11 +97,11 @@ const textureLoader = new THREE.TextureLoader();
 const skyTex = textureLoader.load('sky.png'); const skyMat = new THREE.MeshBasicMaterial({ map: skyTex, side: THREE.BackSide, fog: false }); const skyBox = new THREE.Mesh(new THREE.SphereGeometry(300, 32, 32), skyMat); scene.add(skyBox); 
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.8); scene.add(ambientLight); 
 
-// TERA ORIGINAL STATIC LIGHT (Achhi Shadows)
+// HD Shadows Wapas!
 const mainLight = new THREE.DirectionalLight(0xffeedd, 1.0); mainLight.position.set(20, 60, 20); 
 if(currentGraphics !== 'LOW') { 
     mainLight.castShadow = true; 
-    mainLight.shadow.mapSize.width = 2048; // High Quality Shadows
+    mainLight.shadow.mapSize.width = 2048; 
     mainLight.shadow.mapSize.height = 2048; 
     mainLight.shadow.camera.near = 0.5; mainLight.shadow.camera.far = 200; 
     mainLight.shadow.camera.left = -100; mainLight.shadow.camera.right = 100; 
@@ -109,7 +109,7 @@ if(currentGraphics !== 'LOW') {
 }
 scene.add(mainLight); scene.fog = new THREE.FogExp2(0x87cefa, currentGraphics === 'LOW' ? 0.02 : 0.015); 
 
-// 🧱 WALL & FLOOR TEXTURES
+// 🧱 WALL & FLOOR
 let wallUnit = 5; 
 const brickTex = textureLoader.load('wall.png'); brickTex.wrapS = THREE.RepeatWrapping; brickTex.wrapT = THREE.RepeatWrapping; brickTex.repeat.set(1, 1);
 const wallMat = new THREE.MeshStandardMaterial({ map: brickTex, roughness: 0.9 }); const wallGeo = new THREE.BoxGeometry(wallUnit, wallUnit, wallUnit);
@@ -120,15 +120,15 @@ floorMesh.rotation.x = -Math.PI / 2; if(currentGraphics !== 'LOW') floorMesh.rec
 const menuEnvGroup = new THREE.Group(); scene.add(menuEnvGroup); const myPlayer = new THREE.Group(); scene.add(myPlayer); const opponentPlayer = new THREE.Group(); scene.add(opponentPlayer); opponentPlayer.position.set(1000, 1000, 1000); opponentPlayer.visible = false; 
 
 // ==========================================
-// 🚀 PERFECT SIZE & INSTANCED GLB LOADER 🚀
+// 🚀 PERFECT SIZES + INSTANCING (NO LAG) 🚀
 // ==========================================
 let myMixer = null, oppMixer = null; let myAnims = {}, oppAnims = {}; let myCurrentAnim = 'idle', oppCurrentAnim = 'idle'; let lobbyRotationY = 0; let isDraggingLobby = false; 
 const dracoLoader = new THREE.DRACOLoader(); dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/'); 
 const gLoader = new THREE.GLTFLoader(); gLoader.setDRACOLoader(dracoLoader);
 
-// 🎛️ ROCK SIZE FIXED (Pahad se wapas Patthar ban gaya: 0.1)
+// 🎛️ NEW PERFECT SIZES!
 window.GameModels = { tree: null, coin: null, rock: null, grass: null, medkit: null };
-window.PropSizes = { tree: 0.35, rock: 0.1, grass: 1.0, coin: 0.2, medkit: 0.5 }; 
+window.PropSizes = { tree: 0.5, rock: 0.15, grass: 0.4, coin: 0.2, medkit: 0.5 }; 
 
 function prepDynamicModel(gltf, targetSize, centerIt) {
     let model = gltf.scene;
@@ -160,7 +160,7 @@ function buildInstancedProps(type, dataArray) {
         if(c.isMesh) {
             let imesh = new THREE.InstancedMesh(c.geometry, c.material, dataArray.length);
             if(currentGraphics !== 'LOW') { 
-                imesh.castShadow = true; // HD Shadows back ON
+                imesh.castShadow = true;  // Asli HD Shadows Wapas
                 imesh.receiveShadow = true; 
             }
             let dummy = new THREE.Object3D();
@@ -176,6 +176,7 @@ function buildInstancedProps(type, dataArray) {
     });
 }
 
+// Fallbacks
 window.createHealthKit = function() { const group = new THREE.Group(); const box = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.6, 0.8), new THREE.MeshStandardMaterial({color: 0xffffff})); const c1 = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.2, 0.2), new THREE.MeshBasicMaterial({color: 0xff0000})); const c2 = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.9), new THREE.MeshBasicMaterial({color: 0xff0000})); box.position.y = 0.3; c1.position.y = 0.6; c2.position.y = 0.6; group.add(box, c1, c2); return group; }
 window.createRealCoin = function() { const group = new THREE.Group(); const rim = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.08, 16, 32), new THREE.MeshStandardMaterial({color: 0xffd700})); const inner = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, 0.1, 32), new THREE.MeshStandardMaterial({color: 0xffaa00})); inner.rotation.x = Math.PI/2; group.add(rim, inner); return group; }
 window.createFortGate = function() { const group = new THREE.Group(); const p1 = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 1.0, 7, 8), wallMat); p1.position.set(-2.5, 3.5, 0); group.add(p1); const p2 = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 1.0, 7, 8), wallMat); p2.position.set(2.5, 3.5, 0); group.add(p2); const beam = new THREE.Mesh(new THREE.BoxGeometry(7, 1.5, 2), wallMat); beam.position.set(0, 7.5, 0); group.add(beam); return group; } 
@@ -254,13 +255,13 @@ window.buildMazeFromMap = function(mapArray, dynamicSize) {
     
     let instData = { tree: [], rock: [], grass: [] };
 
-    // 🌳 150 Trees wapas!
+    // 🌳 150 Trees in Jungle (Makkhan Chalenge Low Poly ke sath)
     let envRange = offset + 100;
     for(let i=0; i<150; i++) { 
         let tx = (Math.random() - 0.5) * envRange * 2; let tz = (Math.random() - 0.5) * envRange * 2;
         if (tx < -offset || tx > offset || tz < -offset || tz > offset) {
-            instData.tree.push({x: tx, y: 0, z: tz, rot: Math.random() * Math.PI*2, scale: 0.8 + Math.random() * 0.5});
-            if(Math.random() > 0.4) instData.grass.push({x: tx+2, y: 0, z: tz+2, rot: Math.random() * Math.PI*2, scale: 0.8 + Math.random() * 0.5});
+            instData.tree.push({x: tx, y: 0, z: tz, rot: Math.random() * Math.PI*2, scale: 0.8 + Math.random() * 0.4});
+            if(Math.random() > 0.4) instData.grass.push({x: tx+2, y: 0, z: tz+2, rot: Math.random() * Math.PI*2, scale: 0.8 + Math.random() * 0.4});
         }
     }
 
