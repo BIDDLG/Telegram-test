@@ -1,4 +1,4 @@
-// 🚀 game.js - ROYAL ESPORTS FULL 3D (ULTRA HD HORROR ATMOSPHERE + LOW-POLY OPTIMIZED) 🚀
+// 🚀 game.js - ROYAL ESPORTS FULL 3D (MOBILE OPTIMIZED HD HORROR) 🚀
 
 const firebaseConfig = { apiKey: "AIzaSyD3bPF3B-a6yR8gQxKcKPBVq9-kSPn3MsY", authDomain: "maze-run-7c4b3.firebaseapp.com", projectId: "maze-run-7c4b3", storageBucket: "maze-run-7c4b3.firebasestorage.app", messagingSenderId: "919108275682", appId: "1:919108275682:web:c14c14061bced458f6fdbb" }; 
 if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); } 
@@ -72,17 +72,23 @@ let runSoundNode = null; let ghostAudioNode = null;
 function playInstantSound(name, loop = false, vol = 0.8) { if (!gameSounds[name]) return null; if (audioContext.state === 'suspended') audioContext.resume(); const source = audioContext.createBufferSource(); source.buffer = gameSounds[name]; source.loop = loop; const gainNode = audioContext.createGain(); gainNode.gain.value = vol; source.connect(gainNode); gainNode.connect(audioContext.destination); source.start(0); return source; } 
 
 // ==========================================
-// 🚀 SMART 3D ENGINE SETUP (ULTRA HD HORROR) 🚀
+// 🚀 MOBILE OPTIMIZED 3D ENGINE SETUP 🚀
 // ==========================================
 const scene = new THREE.Scene(); const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000); 
 
+// 🔥 LAG KILLER 1: TWEAKED RENDERER
 const renderer = new THREE.WebGLRenderer({ antialias: currentGraphics === 'HIGH', powerPreference: "high-performance" }); 
 if (currentGraphics === 'HIGH') { 
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Original Crisp Quality
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.2)); // 2.0 se 1.2 pe lock kiya (Crisp but fast)
     renderer.shadowMap.enabled = true; 
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Asli HD Shadows Wapas
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap; 
+} else if (currentGraphics === 'MEDIUM') {
+    renderer.setPixelRatio(1.0); // Native resolution
+    renderer.shadowMap.enabled = true; 
+    renderer.shadowMap.type = THREE.PCFShadowMap; // Cheaper shadows
 } else { 
-    renderer.setPixelRatio(1); renderer.shadowMap.enabled = false; 
+    renderer.setPixelRatio(0.8); // slight downscale for max FPS
+    renderer.shadowMap.enabled = false; 
 }
 renderer.setSize(window.innerWidth, window.innerHeight); 
 renderer.domElement.style.position = 'fixed'; renderer.domElement.style.top = '0'; renderer.domElement.style.left = '0'; renderer.domElement.style.zIndex = '-1';
@@ -92,29 +98,31 @@ const textureLoader = new THREE.TextureLoader();
 const skyTex = textureLoader.load('sky.png'); const skyMat = new THREE.MeshBasicMaterial({ map: skyTex, side: THREE.BackSide, fog: false }); const skyBox = new THREE.Mesh(new THREE.SphereGeometry(300, 32, 32), skyMat); scene.add(skyBox); 
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.8); scene.add(ambientLight); 
 
-// 🔥 THE MAGIC LIGHT (Tere sath chalega, Lag Khatam, Giant Shadows ON)
+// 🔥 LAG KILLER 2: SMART LIGHTING (Shadow sirf paas mein)
 const mainLight = new THREE.DirectionalLight(0xffeedd, 1.2); 
 scene.add(mainLight); 
 scene.add(mainLight.target); 
 
 if(currentGraphics !== 'LOW') { 
     mainLight.castShadow = true; 
-    mainLight.shadow.mapSize.width = 2048; // Highest Quality
-    mainLight.shadow.mapSize.height = 2048; 
-    mainLight.shadow.camera.near = 0.5; mainLight.shadow.camera.far = 200; 
-    // MAGIC: 150 meter ka area Player ke aas-paas poori tarah cover hoga giant trees ke liye
-    mainLight.shadow.camera.left = -150; 
-    mainLight.shadow.camera.right = 150; 
-    mainLight.shadow.camera.top = 150; 
-    mainLight.shadow.camera.bottom = -150; 
+    mainLight.shadow.mapSize.width = currentGraphics === 'HIGH' ? 1024 : 512; // 2048 se kam kiya
+    mainLight.shadow.mapSize.height = currentGraphics === 'HIGH' ? 1024 : 512; 
+    mainLight.shadow.camera.near = 0.5; mainLight.shadow.camera.far = 80; // 200 se 80 kiya
+    
+    // Shadow area 150m se 40m kar diya (Player ke paas focus)
+    mainLight.shadow.camera.left = -40; 
+    mainLight.shadow.camera.right = 40; 
+    mainLight.shadow.camera.top = 40; 
+    mainLight.shadow.camera.bottom = -40; 
 }
-// Horro feel ke liye gehra Fog (0.025 instead of 0.015)
-scene.fog = new THREE.FogExp2(0x1a1a1a, currentGraphics === 'LOW' ? 0.03 : 0.025); 
+
+// Horro feel ke liye gehra Fog
+scene.fog = new THREE.FogExp2(0x1a1a1a, currentGraphics === 'LOW' ? 0.03 : 0.028); 
 
 // 🧱 WALL & FLOOR TEXTURES
 let wallUnit = 5; 
 const brickTex = textureLoader.load('wall.png'); brickTex.wrapS = THREE.RepeatWrapping; brickTex.wrapT = THREE.RepeatWrapping; brickTex.repeat.set(1, 1);
-const wallMat = new THREE.MeshStandardMaterial({ map: brickTex, roughness: 0.9 }); const wallGeo = new THREE.BoxGeometry(wallUnit, wallUnit, wallUnit);
+const wallMat = new THREE.MeshStandardMaterial({ map: brickTex, roughness: 1.0 }); const wallGeo = new THREE.BoxGeometry(wallUnit, wallUnit, wallUnit);
 const grassTex = textureLoader.load('floor.png'); grassTex.wrapS = THREE.RepeatWrapping; grassTex.wrapT = THREE.RepeatWrapping; grassTex.repeat.set(50, 50); 
 const floorMesh = new THREE.Mesh(new THREE.PlaneGeometry(500, 500), new THREE.MeshStandardMaterial({ map: grassTex, roughness: 1.0, color: 0x999999 })); 
 floorMesh.rotation.x = -Math.PI / 2; if(currentGraphics !== 'LOW') floorMesh.receiveShadow = true; scene.add(floorMesh);
@@ -128,7 +136,6 @@ let myMixer = null, oppMixer = null; let myAnims = {}, oppAnims = {}; let myCurr
 const dracoLoader = new THREE.DRACOLoader(); dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/'); 
 const gLoader = new THREE.GLTFLoader(); gLoader.setDRACOLoader(dracoLoader);
 
-// 🎛️ NEW PERFECT HORROR SIZES!
 window.GameModels = { tree: null, coin: null, rock: null, grass: null, medkit: null };
 window.PropSizes = { tree: 3.5, rock: 0.15, grass: 0.8, coin: 0.2, medkit: 0.8 }; 
 
@@ -151,7 +158,7 @@ const ghostMesh = new THREE.Mesh(new THREE.SphereGeometry(0.8, 16, 16), new THRE
 let ghostMixer = null; let ghostAnim = null;
 gLoader.load('ghost.glb', (gltf) => { const gModel = gltf.scene; gModel.scale.set(1.0, 1.0, 1.0); gModel.position.y = 0; ghostGroup.add(gModel); ghostMesh.visible = false; if(gltf.animations.length) { ghostMixer = new THREE.AnimationMixer(gModel); ghostAnim = ghostMixer.clipAction(gltf.animations[0]); ghostAnim.play(); } });
 
-// INSTANCER (Har giant Tree par shadow chalu!)
+// 🔥 LAG KILLER 3: SMART INSTANCING (Ghaas ki shadow band)
 function buildInstancedProps(type, dataArray) {
     let baseModel = window.GameModels[type];
     if(!baseModel || dataArray.length === 0) return;
@@ -162,10 +169,16 @@ function buildInstancedProps(type, dataArray) {
     baseModel.traverse(c => {
         if(c.isMesh) {
             let imesh = new THREE.InstancedMesh(c.geometry, c.material, dataArray.length);
-            if(currentGraphics !== 'LOW') { 
-                imesh.castShadow = true;     // SHADOWS ON!
+            
+            // Sirf Trees ko Shadow denge HIGH pe, baaki patthar/ghaas light rahenge
+            if(currentGraphics === 'HIGH' && type === 'tree') { 
+                imesh.castShadow = true;     
                 imesh.receiveShadow = true; 
+            } else if (currentGraphics !== 'LOW') {
+                imesh.castShadow = false; // Ghaas/Patthar se shadow nahi aayegi, lag bachega
+                imesh.receiveShadow = true;
             }
+
             let dummy = new THREE.Object3D();
             for(let i=0; i<dataArray.length; i++) {
                 let d = dataArray[i];
@@ -241,7 +254,7 @@ window.dropMedkit = function() { if (myStatus !== 'playing' || myHealth <= 25) r
 window.spawnMedkitLocally = function(x, z, id) { let wPos = window.gridToWorld(x, z); let kit = window.GameModels.medkit ? window.GameModels.medkit.clone() : window.createHealthKit(); kit.position.set(wPos.x, 0.5, wPos.z); let uniqueKey = id || `${x}_${z}_${Date.now()}`; healthMeshes[uniqueKey] = kit; window.mazeGroup.add(kit); }
 
 // ==========================================
-// 🚀 3D MAZE BUILDER ENGINE (ULTRA HD HORROR) 🚀
+// 🚀 3D MAZE BUILDER ENGINE 🚀
 // ==========================================
 window.buildMazeFromMap = function(mapArray, dynamicSize) { 
     if(dynamicSize) { window.mazeSize = dynamicSize; window.gameState.size = dynamicSize; }
@@ -258,7 +271,6 @@ window.buildMazeFromMap = function(mapArray, dynamicSize) {
     
     let instData = { tree: [], rock: [], grass: [] };
 
-    // 🌳 Denser Forest (200 Trees, Optimized Low Poly)
     let envRange = offset + 150;
     for(let i=0; i<200; i++) { 
         let tx = (Math.random() - 0.5) * envRange * 2; let tz = (Math.random() - 0.5) * envRange * 2;
@@ -350,7 +362,7 @@ function animate() {
         menuEnvGroup.visible = false; if(window.mazeGroup) window.mazeGroup.visible = true; skyBox.position.copy(camera.position); let currentSize = window.gameState.size || window.mazeSize || 13;
 
         // 🔥 THE MAGIC (Suraj ab tere sath chalega, Denser Shadows Wapas!)
-        mainLight.position.set(myPlayer.position.x + 30, 80, myPlayer.position.z + 30);
+        mainLight.position.set(myPlayer.position.x + 20, 50, myPlayer.position.z + 20); // Height kam ki taaki shadows better dikhein
         mainLight.target.position.copy(myPlayer.position);
         
         if(isGameRunning) { 
